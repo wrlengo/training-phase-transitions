@@ -383,7 +383,7 @@ The practical implication is narrow and specific. Before an observable is used a
 
 # Data and code availability {.unnumbered}
 
-All per-step and per-epoch metrics, the configuration files and the data behind every figure are in the repository at `github.com/wrlengo/training-phase-transitions`; the 15 final checkpoints (9.6 MB) are archived with the same deposit. A Zenodo DOI will be assigned to the archive on acceptance. Text and figures are released under CC-BY 4.0 and code under the MIT licence.
+All per-step and per-epoch metrics, the configuration files and the data behind every figure are in the public repository at `github.com/wrlengo/training-phase-transitions`, together with the 15 final checkpoints (9.6 MB). The repository carries a reproducible build: a GitHub Actions workflow renders the manuscript on every push, and the rendered paper is served at `wrlengo.github.io/training-phase-transitions`. Text and figures are released under CC-BY 4.0 and code under the MIT licence.
 
 # Funding and competing interests {.unnumbered}
 
@@ -521,4 +521,4 @@ The manuscript requires the Computo Quarto extension:
 quarto add computorg/computo-quarto-extension
 ```
 
-Text and figures are released under CC-BY 4.0 and code under the MIT licence. The data and code archive will be deposited at Zenodo; the repository is `github.com/wrlengo/training-phase-transitions`.
+Text and figures are released under CC-BY 4.0 and code under the MIT licence. The data and code archive is in the public repository `github.com/wrlengo/training-phase-transitions`, tagged `v1.0.0`.

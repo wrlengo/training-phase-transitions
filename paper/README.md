@@ -64,10 +64,17 @@ summarised in `../TRAINING_CONFIGS.md`. The ConvNet was specified at 1.6M steps
 and executed for 200k; both values are in the config files, and the paper
 quotes the executed budget.
 
-## What is not in this repository yet
+## Repository and continuous integration
 
-- Zenodo DOI (the archive will be deposited at acceptance).
-- A CI workflow that runs the demonstration commands.
+The public repository is `github.com/wrlengo/training-phase-transitions`, release
+`v1.0.0`. The workflow in `.github/workflows/publish.yml` renders this manuscript
+with the vendored Computo extension on every push to `main` and deploys the HTML
+to `wrlengo.github.io/training-phase-transitions`. The archived release carries
+the Zenodo DOI.
+
+## What is not in this package
+
+- The CIFAR-10 download (~340 MB); torchvision fetches it on first use.
 - The two optional robustness experiments discussed in the limitations: bin
   sensitivity for the entropy estimator, and a denser learning-rate grid in
   `[0.030, 0.040]` for the exponent.

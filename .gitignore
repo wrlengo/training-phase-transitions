@@ -20,3 +20,7 @@ __pycache__/
 # OS / editor
 .DS_Store
 .trae/
+
+# internal working notes (kept locally)
+paper/COMPUTO_FRAMEWORK.md
+paper/SUBMISSION_CHECKLIST.md
