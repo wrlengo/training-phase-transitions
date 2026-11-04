@@ -1,0 +1,31 @@
+{
+  "experiment": "phase3c_joint_LAR_free_energy",
+  "dataset": "CIFAR-10 (full 50000 train / 10000 test)",
+  "model_name": "UnderparamConvNet (num_channels=8, 10 classes)",
+  "n_params": 19218,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "learning_rates": [
+    0.001,
+    0.01,
+    0.1
+  ],
+  "batch_size": 128,
+  "optimizer": "AdamW",
+  "weight_decay": 0.0005,
+  "total_steps_per_run": 200000,
+  "log_every_steps": 1000,
+  "lar_definition": "log_n RMS alignment, W=fc.weight (10x32), X=GAP test features, n=32",
+  "free_energy": "F = U - eta*S; S = weight-histogram normalized Shannon entropy",
+  "overhead": {
+    "lar_ms_mean": 66.86954619039574,
+    "lar_ms_std": 20.60293475289398,
+    "step_ms_mean": 7.37321559778958,
+    "amortized_overhead_pct_mean": 0.907331111419489,
+    "amortized_overhead_pct_max": 0.9227789588572171
+  },
+  "device": "mps"
+}

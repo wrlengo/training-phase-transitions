@@ -1,0 +1,4 @@
+seed,val_opt_epoch,val_opt_acc,val_opt_saving,trigger_epoch,trigger_acc,trigger_saving,final_epoch,final_acc
+0,14,0.7553,0.974609375,71,0.7449,0.86328125,512,0.7286
+1,19,0.7475,0.96484375,60,0.734,0.884765625,512,0.7222
+2,13,0.7531,0.9765625,61,0.7464,0.8828125,512,0.7163

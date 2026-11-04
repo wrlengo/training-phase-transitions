@@ -1,0 +1,23 @@
+Phase 8: weight-decay control, ConvNet c8 CIFAR-10, 200K steps, 3 seeds
+m = 1 - S_final; one-sided power law, 3000 bootstrap; eta_midpoint = log-linear crossing of m=0.3 (model-free)
+
+             wd  n  n_lrs  m_min  m_max  m_at_lowest  eta_midpoint_m03  eta_max_seedvar  max_seed_std one_sided_fit  eta_c   beta      A  eta_c_lo  eta_c_hi  beta_lo  beta_hi  acc_low_eta  acc_high_eta                                                                         nofit_reason
+5e-4 (baseline) 39     13 0.0023 0.8444       0.0023            0.0396            0.035        0.1891           yes 0.0349 0.2810 1.7147    0.0297    0.0498   0.0718   0.3783          NaN           NaN                                                                                  NaN
+           1e-2 27      9 0.0014 0.8430       0.0015            0.0377            0.050        0.1294           yes 0.0498 0.0582 0.9636    0.0297    0.0498   0.0381   0.2889       0.7094        0.3441                                                                                  NaN
+            1.0 27      9 0.1941 0.8504       0.1953            0.0026            0.005        0.0391            no    NaN    NaN    NaN       NaN       NaN      NaN      NaN       0.5849        0.1000 no ordered phase: m>0.15 at lowest eta (wd-driven weight collapse, not a transition)
+
+Findings:
+1. wd=5e-4 vs 1e-2 (20x stronger): the sharp m~0 -> m~0.85
+   transition survives with nearly identical location
+   (midpoint 0.040 vs 0.038; fit eta_c 0.035 vs grid-edge
+   0.050). Both show large seed variance right at the jump
+   (bistability). So eta_c is NOT fine-tuned to wd=5e-4.
+2. beta for wd=1e-2 is not reliably estimable: only 2 eta
+   points straddle the jump and m saturates near 0.85, which
+   pushes the power-law fit to the eta_c grid edge. The
+   model-free midpoint is the trustworthy location estimate.
+3. wd=1.0: no trainable ordered phase exists at any eta
+   (m=0.20 already at eta=1e-3 with acc 0.58; acc=chance for
+   eta>=0.03). The high m is weight-decay pinning weights
+   near zero (dead network), physically distinct from the
+   above-threshold spectral concentration; no eta_c defined.

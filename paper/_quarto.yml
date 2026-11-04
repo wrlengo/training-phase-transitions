@@ -1,0 +1,84 @@
+project:
+  type: default
+  output-dir: _output
+  render:
+    - main.qmd
+
+title: "Which Observables Track Training Phase Transitions? A Systematic Comparison Across ConvNets, Transformers, and MLPs"
+subtitle: "Order parameters for training transitions are architecture-conditional"
+
+author:
+  - name: "Rui Wang"
+    corresponding: true
+    email: "r-wang18@tsinghua.org.cn"
+    orcid: "0000-0002-2362-3214"
+    affiliations:
+      - name: "Department of Chemical Engineering, Tsinghua University, Beijing 100084, China"
+        city: "Beijing"
+        country: "China"
+  - name: "Yi Ma"
+    affiliations:
+      - name: "Changsha University of Science and Technology, Changsha, China"
+        city: "Changsha"
+        country: "China"
+
+date: "2026-11-05"
+date-format: "YYYY-MM-DD"
+date-modified: "2026-11-05"
+
+abstract: |
+  Are order parameters for training phase transitions architecture-independent?
+  We hold the measurement fixed and vary the architecture: one definition of the
+  thermodynamic observables (internal energy, normalised weight-histogram entropy,
+  and free energy), one scanning protocol, one fitting routine, and three systems --
+  a ConvNet on CIFAR-10 and a Transformer and an MLP on modular arithmetic -- each
+  scanned over a logarithmic grid of learning rates with three seeds and complete
+  checkpoint records.
+
+  In the ConvNet a sharp entropy instability appears at $\eta \approx 0.035$. It carries
+  three independent signatures -- entropy collapse, a peak in seed-to-seed
+  susceptibility, and coexistence of branches -- and it survives a twentyfold change
+  in weight decay, while a weight decay of 1.0 destroys the trainable phase and
+  serves as a negative control. The same order parameter fails elsewhere: in the
+  Transformer it is inverted, and in the MLP it is flat while accuracy stays high
+  and stable wherever training succeeds. Behavioural transitions are present in all
+  three systems; the entropy order parameter responds to them in only one.
+
+  A second-order free-energy expansion of stochastic gradient descent reproduces the
+  qualitative direction but misplaces the transition, which we trace to the
+  isotropic-Hessian approximation under AdamW. We release the protocol, the per-step
+  metrics and the analysis code.
+
+keywords:
+  - Training Dynamics
+  - Phase Transitions
+  - Order Parameters
+  - Reproducibility
+  - Cross-Architecture Comparison
+
+bibliography: references.bib
+
+citation:
+  type: article-journal
+  container-title: "Computo"
+  issn: "2824-7795"
+
+license: CC-BY-4.0
+status: "submitted"
+github-user: "wrlengo"
+repo: "training-phase-transitions"
+
+format:
+  computo-html:
+    code-fold: false
+    code-tools: true
+    number-sections: true
+  computo-pdf:
+    keep-tex: false
+    number-sections: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  freeze: auto

@@ -1,0 +1,14 @@
+Phase 7: weight-entropy order parameter across architectures
+m = 1 - S_final, S = weight-histogram entropy (100 fixed bins, per-arch init range)
+one-sided m = A max(eta-eta_c,0)^beta, 3000 seed bootstrap
+NOTE: mod-addition models use wd=1.0 AdamW betas(.9,.98); ConvNet uses wd=5e-4 (different task/protocol).
+
+                 arch  n  n_lrs  m_min  m_max  m_range  eta_at_mmax  spearman_m_eta  eta_c  beta      A  eta_c_lo  eta_c_hi  beta_lo  beta_hi one_sided_fit                                                     nofit_reason
+   ConvNet (CIFAR-10) 39     13 0.0023 0.8375   0.8352       0.1500          0.9742 0.0349 0.281 1.7147    0.0297    0.0498   0.0718   0.3783           yes                                                              NaN
+Transformer (mod add) 27      9 0.3517 0.5366   0.1849       0.0010         -0.7109    NaN   NaN    NaN       NaN       NaN      NaN      NaN            no inverted: m DECREASES with eta (no m~0 ordered phase at low eta)
+        MLP (mod add) 27      9 0.0019 0.0045   0.0026       0.0001         -0.3646    NaN   NaN    NaN       NaN       NaN      NaN      NaN            no                                   flat (m_max<0.05 at every eta)
+
+Interpretation key:
+- one_sided_fit='yes': sharp m~0 -> m>0 threshold found (ConvNet-like).
+- one_sided_fit='no': m never near zero below a candidate eta_c; the one-sided transition form does not exist for this architecture.
+- spearman_m_eta ~ 0 and tiny m_range: S_final flat in eta (MLP).

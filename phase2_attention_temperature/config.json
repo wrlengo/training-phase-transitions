@@ -1,0 +1,20 @@
+{
+  "experiment": "phase2_attention_temperature",
+  "model_name": "GrokkingTransformer-LearnableTemp (2-layer, d=128, 4 heads)",
+  "n_params": 224776,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_split_seed": 42,
+  "learning_rate": 0.001,
+  "batch_size": 512,
+  "weight_decay": 1.0,
+  "optimizer": "AdamW betas=(0.9,0.98)",
+  "total_steps": 25000,
+  "checkpoint_every_steps": 100,
+  "temperature": "per-head learnable scalar, softmax(QK^T/sqrt(T)), init T=d_k=32 (== standard 1/sqrt(d_k))",
+  "inference_sweep": "T in [0.5*d_k, 3*d_k] = [16, 96], 26 points, weights frozen",
+  "device": "mps"
+}

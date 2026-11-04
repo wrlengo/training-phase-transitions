@@ -1,0 +1,15 @@
+Finite-size scaling, widths L=4,8,12, eta={0.02,0.03,0.05}, 3 seeds, 200k steps
+raw m means (+-std):
+            m_mean   m_std  S_mean  n
+width lr                             
+4     0.02  0.0570  0.0042  0.9430  3
+      0.03  0.0738  0.0059  0.9262  3
+      0.05  0.5826  0.1336  0.4174  3
+8     0.02  0.0243  0.0012  0.9757  3
+      0.03  0.1080  0.1060  0.8920  3
+      0.05  0.5649  0.0847  0.4351  3
+12    0.02  0.0129  0.0034  0.9871  3
+      0.03  0.1546  0.0551  0.8454  3
+      0.05  0.5837  0.0169  0.4163  3
+best collapse: eta_c=0.0160, 1/nu=0.20 (nu=5.000), beta/nu=0.20 (implied beta~1.00), score=0.0043
+CAVEAT: 3 eta points for L=4,12; collapse weakly identified, exploratory only. Width-8 points at eta=0.03/0.05 reused from phase3, eta=0.02 from phase5.

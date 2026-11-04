@@ -1,0 +1,8 @@
+DENSE critical-exponent fit, m=1-S_final
+points: 15 phase3 + 24 phase5 completed = 39 total (3 seeds each)
+point: eta_c=0.03450 beta=0.3582 A=2.2061
+bootstrap 5000 95% CI: eta_c [0.02950,0.04950], beta [0.075,0.394], A [1.002,2.282]
+prior 5-pt exploratory estimate: eta_c=0.030, beta=0.26
+phase3_5pt: eta_c=0.03100 beta=0.279 A=1.692
+phase5_8pt: eta_c=0.03450 beta=0.361 A=2.197
+diverged runs (excluded): none

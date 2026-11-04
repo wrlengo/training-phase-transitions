@@ -1,0 +1,20 @@
+{
+  "experiment": "phase1b_validation_free_baselines_vs_LAR",
+  "model_name": "GrokkingTransformer (same as stage 1, 224768 params)",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "learning_rate": 0.001,
+  "batch_size": 512,
+  "weight_decay": 1.0,
+  "total_steps": 25000,
+  "checkpoint_every_steps": 100,
+  "baselines": {
+    "grad_norm": "full-model gradient L2 norm on fresh train batch",
+    "w_norm": "Frobenius norm of unembedding W",
+    "hess_tr": "1-probe Rademacher Hutchinson trace of d2L/dW2 (W=unembed)"
+  },
+  "analysis": "onset = sustained 10% normalized change; predictive r computed on pre-grokking checkpoints only"
+}

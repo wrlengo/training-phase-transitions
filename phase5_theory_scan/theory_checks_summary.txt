@@ -1,0 +1,8 @@
+Phase 5 theory checks (see THEORY_sgd_free_energy.md)
+completed runs: 24; diverged: 0
+P1 linear fit (dF/dt)/eta = 7.8094e-05*eta + -6.9183e-06; zero crossing eta = 0.0886
+P2 mean local eta_c* (ratio of time-averaged means, per run then seeds) = 2004.8878; positive runs 8/8 (range 825.9367-3194.7595)
+P4 heat flux minimal at eta = 0.06
+P5 Var_seed(S) peaks at eta = 0.035; Var_t(dS/dt) peaks at eta = 0.035
+P6 same-units ratio measured std(dS)/estimator floor: mean 0.33, max 0.70; 8/8 etas have measured <= 1.1x floor (per-1000-step dS is at the histogram estimation noise floor)
+    residual physical std(dS) after variance subtraction: [0.0, 0.0, 0.0, 0.0, 0.0, 0.00063, 0.0, 0.0]

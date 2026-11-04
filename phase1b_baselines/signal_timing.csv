@@ -1,0 +1,16 @@
+seed,signal,onset_relative_to_grokking,grokking_step
+0,lar,-1900,5900
+1,lar,-3400,10400
+2,lar,-2400,6500
+0,grad_norm,-5700,5900
+1,grad_norm,-6400,10400
+2,grad_norm,-6300,6500
+0,w_norm,-5700,5900
+1,w_norm,-8000,10400
+2,w_norm,-6300,6500
+0,hess_tr,-5700,5900
+1,hess_tr,-6400,10400
+2,hess_tr,-6300,6500
+0,Sw,-1700,5900
+1,Sw,-3700,10400
+2,Sw,-2200,6500

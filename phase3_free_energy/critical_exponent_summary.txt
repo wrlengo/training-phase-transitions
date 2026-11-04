@@ -1,0 +1,4 @@
+one-sided scaling m = A * max(eta - eta_c, 0)^beta, m = 1 - S_final
+point: eta_c=0.0310 beta=0.279 A=1.692 SSE=0.07292
+bootstrap 95% CI: eta_c [0.0290,0.0470], beta [0.109,0.493], A [1.098,3.260]
+caveat: 5 learning rates x 3 seeds only; exploratory.

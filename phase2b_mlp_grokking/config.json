@@ -1,0 +1,20 @@
+{
+  "experiment": "phase2b_mlp_grokking_cross_architecture",
+  "model_name": "GrokkingMLP (2-layer MLP, hidden=256, ReLU)",
+  "n_params": 74849,
+  "input": "concat one-hot [a, b] (194 dims); target (a+b) mod 97",
+  "task": "modular addition mod 97, 30% train / 70% test, split_seed=42",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "learning_rate": 0.001,
+  "batch_size": 512,
+  "optimizer": "AdamW betas=(0.9,0.98)",
+  "weight_decay": 1.0,
+  "total_steps": 100000,
+  "checkpoint_every": 100,
+  "lar_definition": "log_n RMS alignment, W=fc2 (97x256), X=hidden test activations, n=256",
+  "device": "mps"
+}

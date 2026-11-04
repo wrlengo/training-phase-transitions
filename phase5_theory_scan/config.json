@@ -1,0 +1,35 @@
+{
+  "experiment": "phase5_theory_validation_dense_eta_scan",
+  "dataset": "CIFAR-10 (full 50000 train), same protocol as phase 3",
+  "model_name": "UnderparamConvNet (num_channels=8)",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "learning_rates": [
+    0.02,
+    0.025,
+    0.035,
+    0.04,
+    0.06,
+    0.07,
+    0.08,
+    0.15
+  ],
+  "batch_size": 128,
+  "weight_decay": 0.0005,
+  "optimizer": "AdamW",
+  "total_steps_per_run": 200000,
+  "log_every_steps": 1000,
+  "observables": {
+    "G": "||(g1+g2)/2||^2 on independent probe batches",
+    "trC": "||g1-g2||^2/2, unbiased tr of single-batch grad covariance",
+    "trH": "1-probe Rademacher Hessian trace via centred finite-difference HVP eps=1e-3 (MaxPool2d has no 2nd autograd derivative on this build)",
+    "S_bootstrap": "20 multinomial resamples of weight tensor",
+    "S_mm_bias": "Miller-Madow (L_occ-1)/(2N)/ln(bins)"
+  },
+  "rng_isolation": "probe loader own generator (seed+100003); rademacher/bootstrap use dedicated numpy generators",
+  "theory": "E[dU]=-eta G + eta^2/2 tr[H(gg^T+C/B)]; T=eta",
+  "device": "mps"
+}

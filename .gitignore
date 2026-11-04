@@ -1,0 +1,22 @@
+# CIFAR-10 downloads (340 MB, fetched automatically by torchvision)
+/data/
+
+# raw run logs
+*.log
+
+# archives
+*.zip
+paper/submission/
+
+# Quarto build artefacts
+paper/.quarto/
+paper/_freeze/
+paper/_output/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+.trae/

@@ -1,0 +1,15 @@
+{
+  "experiment": "phase4_entropy_stop",
+  "model_name": "UnderparamConvNet (num_channels=8) — reuses stage-3 runs",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "learning_rate": 0.01,
+  "batch_size": 128,
+  "dataset": "CIFAR-10 (full train 50000 / test 10000)",
+  "training": "no early stopping; trained to convergence in stage 3",
+  "trigger_rule": "S rolling-smoothed (window=21, centered); trigger = first epoch after 10% warmup where smoothed dS/dt stays <=0 for 5 consecutive epochs (sustained positive->negative transition); naive_signflip_epoch column gives the unsmoothed crossing for reference",
+  "device": "mps"
+}

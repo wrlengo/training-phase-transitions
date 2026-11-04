@@ -1,0 +1,40 @@
+{
+  "experiment": "phase3_free_energy",
+  "dataset": "CIFAR-10, 5000 train/class (full 50000), test 10000",
+  "model_name": "UnderparamConvNet (num_channels=4, num_classes=10)",
+  "n_params": 5006,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "learning_rates": [
+    0.02,
+    0.03,
+    0.05
+  ],
+  "learning_rates_this_run": [
+    0.02,
+    0.03,
+    0.05
+  ],
+  "batch_size": 128,
+  "weight_decay": 0.0005,
+  "optimizer": "AdamW",
+  "total_steps_per_run_spec": 1600000,
+  "total_steps_per_run_used": 200000,
+  "log_every_steps": 1000,
+  "normalization_mean": [
+    0.4914,
+    0.4822,
+    0.4465
+  ],
+  "normalization_std": [
+    0.247,
+    0.2435,
+    0.2616
+  ],
+  "free_energy": "F = U - T*S, T = eta",
+  "S_definition": "normalized Shannon entropy of weight-value histogram, 100 fixed bins",
+  "device": "mps"
+}
