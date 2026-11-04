@@ -45,18 +45,18 @@ def num(x, d=3):
 
 Training is usually described as a monotone descent in loss, yet several well-documented phenomena contradict that picture: generalisation can arrive long after the training loss has saturated [@power2022grokking; @nanda2023progress], test error can rise and fall with model size [@nakkiran2020double], and gradient descent can settle into an oscillatory regime at the edge of stability [@cohen2021edge]. In each case the network reorganises abruptly, and the reorganisations have been described with the vocabulary of phase transitions: an effective theory of representation learning [@liu2022effective], a first-order transition picture [@gromov2023grokking], and a geometric account in which the weight norm controls the transition [@liu2023omnigrok].
 
-If training undergoes phase transitions, then a natural question follows: which observable, measured under which conditions, reliably indicates that a transition is happening or approaching? The statistical-mechanics literature supplies candidate quantities — free energy, entropy, order parameters, susceptibility [@bahri2020statistical; @engel2001statistical; @zdeborova2016statistical] — but each was developed for a specific model class, and the field has no neutral comparison in which the same definition is applied, unchanged, to different architectures. Comparisons that do exist vary the observable together with the architecture, so architecture dependence and observable dependence cannot be separated. To our knowledge no prior study uses the entropy of the weight-value histogram as a training order parameter, which is why the question is still open rather than settled.
+If training undergoes phase transitions, then a natural question follows: which observable, measured under which conditions, reliably indicates that a transition is happening or approaching? The statistical-mechanics literature supplies candidate quantities — free energy, entropy, order parameters, susceptibility [@bahri2020statistical; @engel2001statistical; @zdeborova2016statistical] — but each was developed for a specific model class; the field has no neutral comparison in which one definition is applied unchanged to different architectures. Comparisons that do exist vary the observable together with the architecture, so architecture dependence and observable dependence cannot be separated. To our knowledge, no prior study uses the entropy of the weight-value histogram as a training order parameter, which is why the question is still open rather than settled.
 
 This paper reports such a comparison. We fix the measurement before seeing any result: one definition of the thermodynamic observables (internal energy $U$, normalised weight-histogram entropy $S$, free energy $F = U - \eta S$), one scanning protocol, one fitting routine, one bootstrap, and one rule for excluding failed runs. We then vary only the architecture: an underparameterised ConvNet on CIFAR-10, and a Transformer and an MLP on modular addition, each scanned over a logarithmic learning-rate grid with three seeds and complete checkpoint records.
 
-Four findings organise the paper. First, the ConvNet shows a sharp entropy instability at $\eta \approx 0.035$, supported by three independent signatures — collapse of $S$, a peak in seed-to-seed susceptibility, and coexistence of two branches at the same rate — and it is decoupled from accuracy, which stays on its plateau while the entropy has already collapsed. Second, the instability is not an artefact of the weight decay used in the baseline: a twentyfold increase moves the midpoint by a few per cent, and a weight decay of 1.0 destroys the trainable phase, which serves as a negative control. Third, the same order parameter does not track the transitions of the other architectures: in the Transformer it is inverted, and in the MLP it is flat, even though behavioural transitions are present in both. Fourth, a second-order free-energy expansion of stochastic gradient descent predicts the right qualitative direction but misplaces the transition, and we locate the failure in the isotropic-Hessian approximation that the derivation requires.
+Four findings organise the paper. First, the ConvNet shows a sharp entropy instability at $\eta \approx 0.035$, supported by three independent signatures — collapse of $S$, a peak in seed-to-seed susceptibility, and coexistence of two branches at the same rate. The instability is decoupled from accuracy: accuracy stays on its plateau while the entropy has already collapsed. Second, the instability is not an artefact of the weight decay used in the baseline: a twentyfold increase moves the midpoint by a few per cent, and a weight decay of 1.0 destroys the trainable phase, which serves as a negative control. Third, the same order parameter does not track the transitions of the other architectures: in the Transformer it is inverted, and in the MLP it is flat, even though behavioural transitions are present in both. Fourth, a second-order free-energy expansion of stochastic gradient descent predicts the right qualitative direction but misplaces the transition, and we locate the failure in the isotropic-Hessian approximation that the derivation requires.
 
 Our contributions are:
 
 1. A systematic cross-architecture numerical test of one order parameter at a time: a single definition, a single scanning protocol, and 9–13 learning rates with three seeds on a ConvNet, a Transformer and an MLP.
 2. Robustness evidence for the ConvNet entropy instability: three independent signatures, invariance under a twentyfold change in weight decay, and a dead-network negative control.
 3. A clear statement of architecture dependence: behavioural transitions are present in all three systems, whereas the entropy order parameter responds in only one.
-4. The quantitative boundary of a free-energy theory: the signed discrepancy for two predictions (P1, P2) and a concrete anisotropic correction to test next.
+4. The quantitative boundary of a free-energy theory: the signed discrepancy for two predictions (P1, P2) and a concrete anisotropic correction with a stated prediction.
 5. An empirical assessment of entropy production as a stopping criterion: second best to validation early stopping, usable when no validation set exists.
 6. A reproducible pipeline: complete per-step metrics and configs, analysis and figure code, and a reproduction guide, intended as an experimental framework for follow-up work.
 
@@ -103,17 +103,17 @@ t1 = pd.DataFrame(
 show_table(t1)
 ```
 
-All runs use AdamW [@loshchilov2019decoupled], the decoupled form of Adam [@kingma2015adam]; the ConvNet with the default moment settings, the two modular models with $\beta_1 = 0.9$ and $\beta_2 = 0.98$, following the grokking literature [@power2022grokking]. Everything runs in PyTorch [@paszke2019pytorch]. The data split seed is 42 everywhere. The ConvNet logs every 1000 steps, the modular models every 100; the finer interval is needed because their runs are shorter and because the entropy-production analysis in Section @sec-stopping requires a resolved derivative.
+All runs use AdamW [@loshchilov2019decoupled], the decoupled form of Adam [@kingma2015adam]: the ConvNet with the default moment settings, the two modular models with $\beta_1 = 0.9$ and $\beta_2 = 0.98$, following the grokking literature [@power2022grokking]. All runs use PyTorch [@paszke2019pytorch]. The data split seed is 42 everywhere. The ConvNet logs every 1000 steps, the modular models every 100; the finer interval is needed because their runs are shorter and because the entropy-production analysis in Section @sec-stopping requires a resolved derivative.
 
 Each run records its executed step budget in `config.json` (`total_steps_per_run_used`), and every number in this paper refers to that budget.
 
 ## Infrastructure
 
-Each run writes a `metrics_*.csv` with one row per logged step, a `config.json`, and a final checkpoint. The CSVs carry the observables ($U$, $S$, $F$), the behavioural metrics (train and test accuracy), and the auxiliary quantities used in Section @sec-theory ($G$, the gradient-covariance trace, the Hessian trace, and the two prediction columns). This means that every figure and every table in the paper can be rebuilt from archived files without retraining.
+Each run writes a `metrics_*.csv` with one row per logged step, a `config.json`, and a final checkpoint. The CSVs carry the observables ($U$, $S$, $F$), the behavioural metrics (train and test accuracy), and the auxiliary quantities used in Section @sec-theory ($G$, the gradient-covariance trace, the Hessian trace, and the two prediction columns). Every figure and table can therefore be rebuilt from archived files without retraining.
 
-Two design choices protect the analysis from post-hoc adjustment. First, the bin edges are frozen at the seed-0 initialisation before any run is inspected, and every run is binned with those edges. Second, the stopping rule of Section @sec-stopping is stated in two versions: the rule used for the reported numbers (a centred 21-epoch smoothing of $\dot S$ plus a five-epoch persistence criterion) and the naive single-crossing epoch, which is kept in its own column (`naive_signflip_epoch`). Reporting the naive version as well makes it visible that the rule was smoothed, and how much the smoothing mattered.
+Two design choices protect the analysis from post-hoc adjustment. First, the bin edges are frozen at the seed-0 initialisation before any run is inspected, and every run is binned with those edges. Second, the stopping rule of Section @sec-stopping is stated in two versions: the rule used for the reported numbers (a centred 21-epoch smoothing of $\dot S$ plus a five-epoch persistence criterion) and the naive single-crossing epoch, which is kept in its own column (`naive_signflip_epoch`). Reporting the naive version as well makes the smoothing visible and shows how much it mattered.
 
-The same scripts accept a demonstration configuration: three learning rates, one seed and 5,000 steps, which verifies that the workflow executes end to end in minutes. Every number reported here comes from the full configuration. The executed step count is recorded in each `config.json`, so a reader who reruns the demo cannot mistake its output for a reproduction of the results.
+The same scripts accept a demonstration configuration: three learning rates, one seed and 5,000 steps, which verifies that the workflow executes end to end in minutes. Every number here comes from the full configuration, and the executed step count in each `config.json` makes the distinction visible, so a reader who reruns the demo cannot mistake its output for a reproduction of the results.
 
 ## Neutral comparison
 
@@ -123,7 +123,7 @@ Reproducibility has become a review criterion in its own right [@pineau2021impro
 
 ## Collapse and decoupling from accuracy
 
-Figure @fig-convnet (a) shows $m(\eta)$ for the 13 ConvNet rates, with validation accuracy on the right axis. At the low end $m$ is indistinguishable from zero ($m = 0.0023$ at $\eta = 0.001$), and at the high end it saturates near $0.84$. The bulk of the collapse lies between $\eta = 0.02$ and $\eta = 0.06$: $m = 0.024$ at $0.02$, $0.108$ at $0.03$, $0.565$ at $0.05$, and $0.691$ at $0.06$. That is four points of the grid, which is narrow but not instantaneous; the width is set by the grid spacing.
+Figure @fig-convnet (a) shows $m(\eta)$ for the 13 ConvNet rates, with validation accuracy on the right axis. At the low end $m$ is indistinguishable from zero ($m = 0.0023$ at $\eta = 0.001$), and at the high end it saturates near $0.84$. The bulk of the collapse lies between $\eta = 0.02$ and $\eta = 0.06$: $m = 0.024$ at $0.02$, $0.108$ at $0.03$, $0.565$ at $0.05$, and $0.691$ at $0.06$. The collapse spans four grid points, so it is narrow but not instantaneous; its width is set by the grid spacing.
 
 The right axis of the same panel answers the obvious objection that $m$ is simply tracking training failure. It is not. The validation accuracy at $\eta = 0.001, 0.01, 0.02, 0.03$ and $0.05$ is $0.701$, $0.722$, $0.733$, $0.733$ and $0.720$: a band of $3.2$ percentage points whose maximum sits at $\eta = 0.035$. At $\eta = 0.05$, where the order parameter has already lost $56$ per cent of its range, accuracy is still $0.720$. Accuracy stays above $0.70$ up to $\eta = 0.06$, where $m$ has already reached $0.691$; by $\eta = 0.1$ it has fallen to $0.612$ while $m$ is $0.803$. The entropy transition therefore precedes, and is decoupled from, the accuracy collapse. The decoupling is the strongest single piece of evidence that $m$ is not a proxy for failure.
 
@@ -163,7 +163,7 @@ Figure @fig-attention (a) shows $T_{\rm attn}$ against step for three seeds. The
 
 ## Entropy-temperature sweep
 
-Figure @fig-attention (b) sweeps $T_{\rm attn}$ at inference and records the Shannon entropy of the attention distributions. The entropy falls from a high-temperature plateau to a low-temperature plateau through a sigmoid, and the half-rise rule gives $T_c = 2.711 \pm 0.476$ across seeds. The temperature the model actually learns is about $2.9$ times below this crossover temperature, which places the trained model well inside the low-entropy regime rather than near the crossover.
+Figure @fig-attention (b) sweeps $T_{\rm attn}$ at inference and records the Shannon entropy of the attention distributions. The entropy falls from a high-temperature plateau to a low-temperature plateau through a sigmoid, and the half-rise rule gives $T_c = 2.711 \pm 0.476$ across seeds. The temperature the model actually learns is about a factor of $2.9$ below this crossover temperature, which places the trained model well inside the low-entropy regime rather than near the crossover.
 
 This sweep concerns $T_{\rm attn}$ and $S_{\rm attn}$, not the learning rate and the weight entropy. The two statements are different: Section @sec-cross scans $\eta$ and measures the entropy of the weights, while this section holds the weights fixed and varies a model parameter. We keep them in separate sections because conflating them is the easiest way to misread the paper.
 
@@ -171,7 +171,7 @@ This sweep concerns $T_{\rm attn}$ and $S_{\rm attn}$, not the learning rate and
 
 Cooling precedes generalisation in this architecture, on this task, with three seeds. That is a description, not a causal claim. The single architecture and the single task limit its scope. The observation is consistent with the mechanistic picture in which attention sharpens onto a small set of Fourier components before the readout learns to use them [@nanda2023progress], but consistency is not evidence for that mechanism.
 
-One further geometric diagnostic, the log-alignment ratio of the unembedding, tracks generalisation closely in this model. It is not a thermodynamic quantity, it does not enter the free-energy analysis, and it is therefore reported only in Appendix B (Figure @fig-lar).
+One further geometric diagnostic, the log-alignment ratio of the unembedding, tracks generalisation closely in this model. It is not a thermodynamic quantity and does not enter the free-energy analysis, so it is reported only in Appendix B (Figure @fig-lar).
 
 ![Attention temperature. (a) Mean learned temperature $T_{\rm attn}$ during training for three seeds; dotted vertical lines mark the grokking step of each seed and the horizontal line is $T_{\rm attn}=1.5$. (b) Attention entropy against inference temperature, one curve per seed with the seed mean in black; the dashed line is the half-rise crossover temperature and the dotted line is the learned value.](figures/fig3_attention.pdf){#fig-attention width=100%}
 
@@ -231,7 +231,7 @@ The third is the confound between architecture and task. The ConvNet sees images
 
 ## A protocol for other architectures {#sec-protocol}
 
-The comparison is cheap to repeat, and the following six steps are what a follow-up study should hold fixed.
+The comparison is cheap to repeat. A follow-up study should hold the following six steps fixed.
 
 1. Freeze the histogram bin edges at the seed-0 initialisation, and reuse them for every rate, seed and regularisation setting.
 2. Use a logarithmic grid of at least nine learning rates, spanning at least three orders of magnitude around the expected transition.
@@ -258,13 +258,13 @@ This yields two predictions. **P1**: the free energy stops decreasing at $\eta_c
 
 ## Comparison with measurement
 
-Figure @fig-thermo shows the trajectories that the expansion is meant to describe, together with the energy-entropy plane for all rates. Figure @fig-theory (a) plots $\dot F/\eta$ in the steady window against $\eta$. The linear fit crosses zero at $\eta = 0.089$, compared with the measured $\eta_c = 0.035$: a factor of $2.6$. The theory places the transition at the right order of magnitude and on the right side of the measured value, and the fitted line changes sign in the same region as the measured points, but individual rates scatter around it by more than the distance to zero in the transition window.
+Figure @fig-thermo shows the trajectories that the expansion is meant to describe, together with the energy-entropy plane for all rates. Figure @fig-theory (a) plots $\dot F/\eta$ in the steady window against $\eta$. The linear fit crosses zero at $\eta = 0.089$, compared with the measured $\eta_c = 0.035$: a factor of $2.6$. The theory places the transition at the right order of magnitude and on the right side of the measured value, and the fitted line changes sign in the same region as the measured points; individual rates, however, scatter around it by more than its distance to zero in the transition window.
 
 Figure @fig-theory (b) gives P2, the locally evaluated $\eta_c^{\star} = G/Q$. The values are $2005$ on average, with a range of $826$ to $3195$. Against the measured $0.035$, the prediction is wrong by nearly five orders of magnitude. Equivalently, the $\eta^2 Q$ term is four orders of magnitude below the $\eta G$ term at the measured transition, so the expansion predicts that noise is negligible precisely where the measured entropy undergoes its transition.
 
 ## The isotropic approximation
 
-A five-order discrepancy is not a small correction, so the question is which assumption fails. The derivation treats the Hessian as acting on the raw parameter coordinates. AdamW does not: it rescales each coordinate by the inverse square root of its second moment, so the step is $\Delta w = -\eta D^{-1} g$ with $D = \mathrm{diag}(\sqrt{v})$. The curvature that enters the second-order term is then the metric-transformed Hessian $\tilde H = D^{-1/2} H D^{-1/2}$, and the noise term becomes
+A discrepancy of five orders of magnitude is not a small correction, so the question is which assumption fails. The derivation treats the Hessian as acting on the raw parameter coordinates. AdamW does not: it rescales each coordinate by the inverse square root of its second moment, so the step is $\Delta w = -\eta D^{-1} g$ with $D = \mathrm{diag}(\sqrt{v})$. The curvature that enters the second-order term is then the metric-transformed Hessian $\tilde H = D^{-1/2} H D^{-1/2}$, and the noise term becomes
 
 $$\tilde Q = \mathrm{tr}\!\left[\tilde H\left(\tilde g\tilde g^{\top} + \tilde\Sigma/B\right)\right], \qquad \tilde g = D^{-1/2} g,$$
 
@@ -306,7 +306,7 @@ show_table(t3)
 
 The trigger fires at epochs $71$, $60$ and $61$ for the three seeds, against validation optima at $14$, $19$ and $13$. The rule therefore saves $87.5$ per cent of the compute on average, against $97.2$ per cent for validation-based early stopping. Validation early stopping is better by a factor of about $1.1$ in compute, which is expected: it observes the quantity of interest directly.
 
-The accuracy comparison is more interesting. At the trigger, validation accuracy is $0.742$, while at the end of the budget it is $0.722$; stopping at the trigger leaves the model in a better state than finishing the schedule, because the later epochs overfit. This does not make the trigger better than validation early stopping, which would stop even earlier and at least as accurate a point. It does make the trigger usable when no validation set is available, which is the regime in which it is intended to operate.
+The accuracy comparison is more interesting. At the trigger, validation accuracy is $0.742$, while at the end of the budget it is $0.722$; stopping at the trigger leaves the model in a better state than finishing the schedule, because the later epochs overfit. This does not make the trigger better than validation early stopping, which would stop even earlier, at at least as accurate a point. It does make the trigger usable when no validation set is available, which is the regime in which it is intended to operate.
 
 ## Resolution
 
@@ -324,7 +324,7 @@ The results reduce to five statements, each with an explicit strength. (i) The C
 
 ## What the architecture dependence means
 
-The tempting summary is that the thermodynamic language fails. It does not fail; it is conditional. A weight-histogram entropy measures how spread out the marginal distribution of weights is, and whether that quantity has a sharp, rate-driven transition depends on how the architecture stores what it has learned. In the ConvNet the two are coupled closely enough that the entropy collapse and the loss plateau separate cleanly. In the modular models the stored function is a discrete algorithm built from a few Fourier components [@nanda2023progress], and the marginal weight distribution does not reorganise in the same way.
+The tempting summary is that the thermodynamic language fails. It does not fail; it is conditional. A weight-histogram entropy measures how spread out the marginal distribution of weights is, and whether that quantity has a sharp, rate-driven transition depends on how the architecture stores what it has learned. In the ConvNet the entropy collapse and the loss plateau are distinct events that can be separated cleanly. In the modular models the stored function is a discrete algorithm built from a few Fourier components [@nanda2023progress], and the marginal weight distribution does not reorganise in the same way.
 
 This is a hypothesis, and Section @sec-mechanisms lists the three mechanisms that could produce it. Only one of them — the geometric blindness of a histogram — is specific to the choice of observable; the other two are properties of the optimiser and of the task.
 
@@ -338,13 +338,13 @@ The protocols are not fully isomorphic. The ConvNet differs from the modular pai
 
 The exponent $\beta$ is not identified. The bootstrap is multi-modal and only two grid points fall inside the $\eta_c$ interval, so the value is reported as exploratory and used nowhere. The finite-size scaling analysis (Appendix B) is in the same position: three widths at three rates are too few to identify a collapse, and the best-fit parameters sit at the edge of the search grid.
 
-The temperature study covers one architecture and one task, with three seeds. The finite-resolution argument of Section @sec-stopping limits what can be said about $\dot S$ at a 1000-step interval. And the ConvNet was executed for 200,000 steps; all statements refer to that budget.
+The temperature study covers one architecture and one task, with three seeds. The finite-resolution argument of Section @sec-stopping limits what can be said about $\dot S$ at a 1000-step interval. Finally, the ConvNet was executed for 200,000 steps; all statements refer to that budget.
 
 ## Candidate observables
 
 The title speaks of observables in the plural. Table 4 lists every observable that was measured, where its result is reported, and what it showed.
 
-**Table 4.** Observable candidates for training transitions, all measured in this study.
+**Table 4.** Observables tested in this study, the section where each result is reported, and the outcome.
 
 ```{python}
 #| echo: false
@@ -362,18 +362,18 @@ t4 = pd.DataFrame(
 show_table(t4)
 ```
 
-Four of the appendix signals — gradient norm, weight norm, the Hessian trace and the spectral entropy — anticipate grokking by thousands of steps, and the log-alignment ratio by somewhat less. Their lead times are longer than that of the temperature collapse, which is a reminder that anticipation is not the same as identification: a signal can be early without being an order parameter. The ones measured here are reported as timing and predictive diagnostics only.
+Four of the appendix signals — gradient norm, weight norm, the Hessian trace and the spectral entropy — anticipate grokking by thousands of steps, and the log-alignment ratio by somewhat less. Their lead times exceed that of the temperature collapse, a reminder that anticipation is not identification: a signal can be early without being an order parameter. All of them are reported as timing and predictive diagnostics only.
 
 # Conclusion {#sec-conclusion}
 
-The question was which observable indicates a training phase transition, and whether the answer depends on the architecture. Holding the measurement fixed and varying the architecture, we found a sharp, weight-decay-robust entropy instability in a ConvNet, an inverted order parameter in a Transformer, and a flat one in an MLP under a protocol matched to the Transformer. Behavioural transitions are present in all three systems; the entropy order parameter responds in only one. A second-order free-energy expansion of stochastic gradient descent captures the qualitative structure and misplaces the transition, and the isotropic-Hessian approximation is the identified missing ingredient.
+The question was which observable indicates a training phase transition, and whether the answer depends on the architecture. Holding the measurement fixed and varying the architecture, we found a sharp, weight-decay-robust entropy instability in a ConvNet, an inverted order parameter in a Transformer, and a flat one in an MLP under a protocol matched to the Transformer. Behavioural transitions are present in all three systems; the entropy order parameter responds in only one. A second-order free-energy expansion of stochastic gradient descent captures the qualitative structure but misplaces the transition; the isotropic-Hessian approximation is the identified missing ingredient.
 
 Our contributions are:
 
 1. A systematic cross-architecture numerical test of one order parameter at a time: a single definition, a single scanning protocol, and 9–13 learning rates with three seeds on a ConvNet, a Transformer and an MLP.
 2. Robustness evidence for the ConvNet entropy instability: three independent signatures, invariance under a twentyfold change in weight decay, and a dead-network negative control.
 3. A clear statement of architecture dependence: behavioural transitions are present in all three systems, whereas the entropy order parameter responds in only one.
-4. The quantitative boundary of a free-energy theory: the signed discrepancy for two predictions (P1, P2) and a concrete anisotropic correction to test next.
+4. The quantitative boundary of a free-energy theory: the signed discrepancy for two predictions (P1, P2) and a concrete anisotropic correction with a stated prediction.
 5. An empirical assessment of entropy production as a stopping criterion: second best to validation early stopping, usable when no validation set exists.
 6. A reproducible pipeline: complete per-step metrics and configs, analysis and figure code, and a reproduction guide, intended as an experimental framework for follow-up work.
 
@@ -381,15 +381,15 @@ The practical implication is narrow and specific. Before an observable is used a
 
 # Data and code availability {.unnumbered}
 
-All per-step and per-epoch metrics, the configuration files and the data behind every figure are in the public repository at `github.com/wrlengo/training-phase-transitions`, together with the 15 final checkpoints (9.6 MB). The repository carries a reproducible build: a GitHub Actions workflow renders the manuscript on every push, and the rendered paper is served at `wrlengo.github.io/training-phase-transitions`. Release `v1.0.1` is archived on Zenodo under DOI [10.5281/zenodo.23957417](https://doi.org/10.5281/zenodo.23957417). Text and figures are released under CC-BY 4.0 and code under the MIT licence.
+All per-step and per-epoch metrics, the configuration files and the data behind every figure are in the public repository at `github.com/wrlengo/training-phase-transitions`, together with the 15 final checkpoints (9.6 MB). The repository carries a reproducible build: a GitHub Actions workflow renders the manuscript on every push, and the rendered paper is served at `wrlengo.github.io/training-phase-transitions`. Releases `v1.0.1` and `v1.0.2` are archived on Zenodo under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416), which resolves to the latest version. Text and figures are released under CC-BY 4.0 and code under the MIT licence.
 
 # Funding and competing interests {.unnumbered}
 
-This work received no specific grant from any funding agency in the public, commercial or not-for-profit sectors. The author declares no competing interests.
+This work received no specific grant from any funding agency in the public, commercial or not-for-profit sectors. The authors declare no competing interests.
 
 # Use of generative AI {.unnumbered}
 
-The author used an AI coding and writing assistant to draft prose and to generate analysis and figure code. All numerical results in this paper are produced by the released scripts from archived per-step records, and every reported value, figure and citation was checked against those records before submission. The assistant did not decide the claims, the protocol or the exclusion rules.
+The authors used an AI coding and writing assistant to draft prose and to generate analysis and figure code. All numerical results in this paper are produced by the released scripts from archived per-step records, and every reported value, figure and citation was checked against those records before submission. The assistant did not decide the claims, the protocol or the exclusion rules.
 
 # References {.unnumbered}
 
@@ -501,7 +501,7 @@ Computing this diagnostic costs $66.9$ milliseconds per window against $7.37$ mi
 
 The flat histogram entropy of the MLP does not mean that nothing changes in this architecture. On the same 30 per cent split at $\eta = 10^{-3}$ (three seeds, 100,000 steps, 500-step logging), we recorded the participation ratio and the stable rank of both weight matrices, and the spectrum of the per-input Jacobian.
 
-The geometric quantities move sharply at the start of training and then drift. At initialisation the participation ratio of the first layer is $110$ and its stable rank $38$; by step 500 the participation ratio has fallen to $67$ and the stable rank to $0.99$, while test accuracy is still zero. Over the plateau that precedes grokking (steps 10,000 to 50,000) the participation ratio averages $106$ and the stable rank $0.54$; at the end of the budget they are $111$ and $0.42$. The second layer behaves in the same way: its participation ratio rises from $70$ to $77$ while its stable rank falls from $45$ to $0.10$. The per-input Jacobian stable rank falls from $82$ at initialisation to $0.027$ at step 500 and to $0.001$ at the end, and the normalised Jacobian spectral entropy stays between $0.77$ and $0.88$ throughout. The PCA-95 dimension of the hidden representation expands from $153$ to $194$, and the effective number of Fourier components falls from $260$ at initialisation to between $52$ and $68$ over the rest of the run.
+The geometric quantities move sharply at the start of training and then drift. At initialisation the participation ratio of the first layer is $110$ and its stable rank $38$; by step 500 the participation ratio has fallen to $67$ and the stable rank to $0.99$, while test accuracy is still zero. Over the plateau that precedes grokking (steps 10,000 to 50,000) the participation ratio averages $106$ and the stable rank $0.54$; at the end of the budget they are $111$ and $0.42$. The second layer behaves similarly: its participation ratio rises from $70$ to $77$ while its stable rank falls from $45$ to $0.10$. The per-input Jacobian stable rank falls from $82$ at initialisation to $0.027$ at step 500 and to $0.001$ at the end, and the normalised Jacobian spectral entropy stays between $0.77$ and $0.88$ throughout. The PCA-95 dimension of the hidden representation expands from $153$ to $194$, and the effective number of Fourier components falls from $260$ at initialisation to between $52$ and $68$ over the rest of the run.
 
 Grokking, defined as the first logged step with test accuracy above $0.9$, occurs at $54{,}000$, $58{,}000$ and $65{,}500$ steps for the three seeds. None of the geometric quantities has a feature there: the movement happens within the first 500 steps, before test accuracy leaves zero, and afterwards the drift is monotone and slow. In this architecture the behavioural transition is spectrally quiet, which is consistent with the flat order parameter of Section @sec-cross and separates the failure of the histogram from a failure of the measurement apparatus.
 
@@ -521,12 +521,12 @@ python code/figures.py
 quarto render
 ```
 
-A demonstration run uses three rates, one seed and 5,000 steps through the same scripts, and exists to check that the pipeline executes; it is not a reproduction of the results. The full configuration is documented in the archived configs, and the checkpoints are archived separately because they are binary. The environment is pinned to Python 3.11, PyTorch 2.3, NumPy 1.26, pandas 2.2 and Matplotlib 3.8, all from conda-forge.
+A demonstration run uses three rates, one seed and 5,000 steps through the same scripts, and exists to check that the pipeline executes; it is not a reproduction of the results. The full configuration is documented in the archived configs, and the checkpoints are archived in the same release because they are binary. The environment is pinned to Python 3.11, PyTorch 2.3, NumPy 1.26, pandas 2.2 and Matplotlib 3.8, all from conda-forge.
 
-The manuscript requires the Computo Quarto extension:
+The manuscript uses the Computo Quarto extension, which is vendored in `paper/_extensions/computo`, so the render step below needs no installation. Only a fresh copy without that directory requires the extension to be added first:
 
 ```bash
 quarto add computorg/computo-quarto-extension
 ```
 
-Text and figures are released under CC-BY 4.0 and code under the MIT licence. The data and code archive is in the public repository `github.com/wrlengo/training-phase-transitions`, tagged `v1.0.1` and archived at DOI [10.5281/zenodo.23957417](https://doi.org/10.5281/zenodo.23957417).
+Text and figures are released under CC-BY 4.0 and code under the MIT licence. The data and code archive is in the public repository `github.com/wrlengo/training-phase-transitions`, tagged `v1.0.2`, and archived under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416).

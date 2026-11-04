@@ -30,14 +30,14 @@ abstract: |
   Are order parameters for training phase transitions architecture-independent?
   We hold the measurement fixed and vary the architecture: one definition of the
   thermodynamic observables (internal energy, normalised weight-histogram entropy,
-  and free energy), one scanning protocol, one fitting routine, and three systems --
-  a ConvNet on CIFAR-10 and a Transformer and an MLP on modular arithmetic -- each
-  scanned over a logarithmic grid of learning rates with three seeds and complete
-  checkpoint records.
+  and free energy), one scanning protocol and one fitting routine, applied to three
+  systems — a ConvNet on CIFAR-10, and a Transformer and an MLP on modular
+  arithmetic — each scanned over a logarithmic grid of learning rates with three
+  seeds and complete checkpoint records.
 
-  In the ConvNet a sharp entropy instability appears at $\eta \approx 0.035$. It carries
-  three independent signatures -- entropy collapse, a peak in seed-to-seed
-  susceptibility, and coexistence of branches -- and it survives a twentyfold change
+  In the ConvNet a sharp entropy instability appears at $\eta \approx 0.035$. It
+  carries three independent signatures — entropy collapse, a peak in seed-to-seed
+  susceptibility, and coexistence of branches — and it survives a twentyfold change
   in weight decay, while a weight decay of 1.0 destroys the trainable phase and
   serves as a negative control. The same order parameter fails elsewhere: in the
   Transformer it is inverted, and in the MLP it is flat while accuracy stays high
@@ -46,8 +46,8 @@ abstract: |
 
   A second-order free-energy expansion of stochastic gradient descent reproduces the
   qualitative direction but misplaces the transition, which we trace to the
-  isotropic-Hessian approximation under AdamW. We release the protocol, the per-step
-  metrics and the analysis code.
+  isotropic-Hessian approximation under AdamW. The protocol, the per-step metrics
+  and the analysis code are released with the archived record.
 
 keywords:
   - Training Dynamics
