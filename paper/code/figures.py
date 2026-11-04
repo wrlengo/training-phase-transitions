@@ -505,6 +505,52 @@ def fig_lar():
     return fig
 
 
+def fig_mlp_geometry():
+    d = _load("mlp_geometry.csv")
+    seeds = sorted(d["seed"].unique())
+    colors = [C_BLUE, C_ORANGE, C_GREEN]
+    grok = d[d["test_acc"] >= 0.9].groupby("seed")["step"].min().mean()
+
+    fig, axes = plt.subplots(1, 3, figsize=(9.2, 2.9))
+
+    ax = axes[0]
+    for s, c in zip(seeds, colors):
+        g = d[d["seed"] == s].sort_values("step")
+        ax.plot(g["step"], g["test_acc"], color=c, lw=1.2, label=f"seed {s}")
+    ax.axvline(grok, color=C_GRAY, ls=":", lw=1)
+    ax.set_xlabel("step")
+    ax.set_ylabel("test accuracy")
+    ax.set_title("behaviour")
+    ax.set_ylim(-0.02, 1.02)
+    _tag(ax, "a")
+
+    ax = axes[1]
+    for s, c in zip(seeds, colors):
+        g = d[d["seed"] == s].sort_values("step")
+        ax.plot(g["step"], g["pr1"], color=c, lw=1.2, label=f"PR fc1 s{s}")
+        ax.plot(g["step"], g["pr2"], color=c, lw=1.0, ls="--", label=f"PR fc2 s{s}")
+    ax.set_xlabel("step")
+    ax.set_ylabel("participation ratio")
+    ax.set_title("weight geometry")
+    ax.legend(frameon=False, fontsize=6.5, ncol=2)
+    _tag(ax, "b")
+
+    ax = axes[2]
+    for s, c in zip(seeds, colors):
+        g = d[d["seed"] == s].sort_values("step")
+        ax.plot(g["step"], g["sr1"], color=c, lw=1.2, label=f"srank fc1 s{s}")
+        ax.plot(g["step"], g["srJ"], color=c, lw=1.0, ls="--", label=f"srank J s{s}")
+    ax.set_yscale("log")
+    ax.set_xlabel("step")
+    ax.set_ylabel("stable rank (log)")
+    ax.set_title("stable rank and Jacobian")
+    ax.legend(frameon=False, fontsize=6.5, ncol=2)
+    _tag(ax, "c")
+
+    fig.tight_layout()
+    return fig
+
+
 ALL = {
     "fig1_convnet": fig_convnet,
     "fig2_wd": fig_wd,
@@ -517,6 +563,7 @@ ALL = {
     "figB_fss": fig_fss,
     "figB_baselines": fig_baselines,
     "figB_lar": fig_lar,
+    "figB_mlp_geometry": fig_mlp_geometry,
 }
 
 

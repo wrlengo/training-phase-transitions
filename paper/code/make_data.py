@@ -328,7 +328,19 @@ def build_lar() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 9. Key numbers for inline text
+# 9. MLP geometric observables (appendix B.10)
+# ---------------------------------------------------------------------------
+def build_mlp_geometry() -> None:
+    cols = [
+        "seed", "step", "test_acc", "lar", "k_eff", "pca95", "Sw",
+        "pr1", "sr1", "pr2", "sr2", "prJ", "srJ", "entJ",
+    ]
+    mt = _read("phase4b_mlp_order_params/metrics_mlp_op.csv").loc[:, cols]
+    mt.to_csv(DATA / "mlp_geometry.csv", index=False)
+
+
+# ---------------------------------------------------------------------------
+# 10. Key numbers for inline text
 # ---------------------------------------------------------------------------
 def key_numbers(
     conv: pd.DataFrame,
@@ -445,6 +457,7 @@ def main() -> None:
     build_fss()
     build_baselines()
     build_lar()
+    build_mlp_geometry()
 
     kn = key_numbers(conv, theory, attn, stop, modular, wd)
     (DATA / "key_numbers.json").write_text(json.dumps(kn, indent=2))

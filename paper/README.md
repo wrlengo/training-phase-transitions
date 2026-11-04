@@ -13,10 +13,9 @@ paper/
 ├── _quarto.yml              Computo metadata, abstract, formats
 ├── references.bib           26 entries, all checked against Crossref/arXiv
 ├── environment.yml          conda environment (Python 3.11, PyTorch 2.3)
-├── COMPUTO_FRAMEWORK.md     working notes: claim-evidence ledger and section plan
 ├── code/
 │   ├── make_data.py         raw phase*/ outputs -> compact CSV in data/
-│   ├── figures.py           data/ -> figures/*.pdf and *.png (11 figures)
+│   ├── figures.py           data/ -> figures/*.pdf and *.png (12 figures)
 │   └── training/            the 14 training and analysis scripts used for the runs
 ├── data/                    analysis-ready CSV/JSON; every quoted number comes from here
 └── figures/                 vector PDFs and PNG previews
@@ -74,9 +73,6 @@ to `wrlengo.github.io/training-phase-transitions`.
 ## What is not in this package
 
 - The CIFAR-10 download (~340 MB); torchvision fetches it on first use.
-- The two optional robustness experiments discussed in the limitations: bin
-  sensitivity for the entropy estimator, and a denser learning-rate grid in
-  `[0.030, 0.040]` for the exponent.
 
 ## Licences
 
