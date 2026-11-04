@@ -10,6 +10,8 @@ per-step metrics of every run, the configuration of every run, the 15 final
 checkpoints, and the scripts that turn those records into the tables and figures
 of the manuscript.
 
+Archived release: `v1.0.1`, DOI [10.5281/zenodo.23957417](https://doi.org/10.5281/zenodo.23957417).
+
 ## Layout
 
 ```
