@@ -69,8 +69,7 @@ quotes the executed budget.
 The public repository is `github.com/wrlengo/training-phase-transitions`, release
 `v1.0.0`. The workflow in `.github/workflows/publish.yml` renders this manuscript
 with the vendored Computo extension on every push to `main` and deploys the HTML
-to `wrlengo.github.io/training-phase-transitions`. The archived release carries
-the Zenodo DOI.
+to `wrlengo.github.io/training-phase-transitions`.
 
 ## What is not in this package
 
