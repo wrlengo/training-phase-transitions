@@ -30,11 +30,17 @@ jobs:
         with:
           version: "1.5.57"
 
-      - name: Render manuscript
+      - uses: quarto-dev/quarto-actions/install-tinytex@v2
+
+      - name: Render manuscript (HTML)
         working-directory: paper
         run: |
           quarto render main.qmd --to computo-html
           cp _output/main.html _output/index.html
+
+      - name: Render manuscript (PDF)
+        working-directory: paper
+        run: quarto render main.qmd --to computo-pdf
 
       - uses: actions/upload-pages-artifact@v3
         with:
