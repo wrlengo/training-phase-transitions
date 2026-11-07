@@ -381,7 +381,7 @@ The practical implication is narrow and specific. Before an observable is used a
 
 # Data and code availability {.unnumbered}
 
-All per-step and per-epoch metrics, the configuration files and the data behind every figure are in the public repository at `github.com/wrlengo/training-phase-transitions`, together with the 15 final checkpoints (9.6 MB). The repository carries a reproducible build: a GitHub Actions workflow renders the manuscript on every push, and the rendered paper is served at `wrlengo.github.io/training-phase-transitions`. Releases `v1.0.1` and `v1.0.2` are archived on Zenodo under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416), which resolves to the latest version. Text and figures are released under CC-BY 4.0 and code under the MIT licence.
+All per-step and per-epoch metrics, the configuration files and the data behind every figure are in the public repository at `github.com/wrlengo/training-phase-transitions`, together with the 15 final checkpoints (9.6 MB). The repository carries a reproducible build: a GitHub Actions workflow renders the manuscript on every push, and the rendered paper is served at `wrlengo.github.io/training-phase-transitions`. Releases `v1.0.1`&ndash;`v1.0.3` are archived on Zenodo under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416), which resolves to the latest version. Text and figures are released under CC-BY 4.0 and code under the MIT licence.
 
 # Funding and competing interests {.unnumbered}
 
@@ -529,4 +529,4 @@ The manuscript uses the Computo Quarto extension, which is vendored in `paper/_e
 quarto add computorg/computo-quarto-extension
 ```
 
-Text and figures are released under CC-BY 4.0 and code under the MIT licence. The data and code archive is in the public repository `github.com/wrlengo/training-phase-transitions`, tagged `v1.0.2`, and archived under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416).
+Text and figures are released under CC-BY 4.0 and code under the MIT licence. The data and code archive is in the public repository `github.com/wrlengo/training-phase-transitions`, tagged `v1.0.3`, and archived under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416).
