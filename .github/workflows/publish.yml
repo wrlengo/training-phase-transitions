@@ -33,6 +33,13 @@ jobs:
       - name: Install TinyTeX
         run: quarto install tinytex --no-prompt
 
+      - name: Install LaTeX packages needed by the template
+        run: |
+          TL=$(find "$HOME" -name tlmgr -type f 2>/dev/null | head -1)
+          export PATH="$(dirname "$TL"):$PATH"
+          echo "tlmgr at: $TL"
+          tlmgr install libertinus libertinus-fonts fontspec
+
       - name: Render manuscript (HTML)
         working-directory: paper
         run: |
