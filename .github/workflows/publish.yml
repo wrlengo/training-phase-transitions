@@ -34,6 +34,7 @@ jobs:
 
       - name: Install LaTeX packages needed by the template
         run: |
+          tlmgr update --self
           tlmgr install libertinus libertinus-fonts fontspec
 
       - name: Render manuscript (HTML)
