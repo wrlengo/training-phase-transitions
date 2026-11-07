@@ -30,7 +30,8 @@ jobs:
         with:
           version: "1.5.57"
 
-      - uses: quarto-dev/quarto-actions/install-tinytex@v2
+      - name: Install TinyTeX
+        run: quarto install tinytex --no-prompt
 
       - name: Render manuscript (HTML)
         working-directory: paper
