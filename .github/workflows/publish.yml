@@ -29,13 +29,11 @@ jobs:
       - uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: "1.5.57"
-
-      - name: Install TinyTeX
-        run: quarto install tinytex --no-prompt
+          tinytex: true
 
       - name: Install LaTeX packages needed by the template
         run: |
-          TL=$(find "$HOME" -name tlmgr -type f 2>/dev/null | head -1)
+          TL=$(find / -name tlmgr -type f 2>/dev/null | head -1)
           export PATH="$(dirname "$TL"):$PATH"
           echo "tlmgr at: $TL"
           tlmgr install libertinus libertinus-fonts fontspec
