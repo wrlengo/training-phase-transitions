@@ -505,6 +505,34 @@ def fig_lar():
     return fig
 
 
+def fig_lar_timing():
+    d = _load("lar_trajectory.csv")
+    tt = _load("lar_timing.csv")
+    seeds = sorted(d["seed"].unique())
+    colors = [C_BLUE, C_ORANGE, C_GREEN]
+
+    fig, ax = plt.subplots(figsize=(4.8, 3.1))
+    for s, c in zip(seeds, colors):
+        g = d[d["seed"] == s].sort_values("step")
+        ax.plot(g["step"], g["lar"], color=c, lw=1.2, label=f"seed {s}")
+        row = tt[tt["seed"] == s].iloc[0]
+        onset = float(row["fluctuation_onset_step"])
+        grok = int(row["grokking_step"])
+        near = g.loc[(g["step"] - onset).abs().idxmin()]
+        near_g = g.loc[(g["step"] - grok).abs().idxmin()]
+        ax.plot(near["step"], near["lar"], marker="s", ms=4.5, mfc="none",
+                mec=c, ls="none")
+        ax.plot(near_g["step"], near_g["lar"], marker="o", ms=4.5, mfc=c,
+                mec=c, ls="none")
+    ax.set_xscale("log")
+    ax.set_xlabel("step")
+    ax.set_ylabel(r"log-alignment ratio (LAR)")
+    ax.set_title("open square: fluctuation onset, filled circle: grokking", fontsize=8)
+    ax.legend(frameon=False, loc="lower right")
+    fig.tight_layout()
+    return fig
+
+
 def fig_mlp_geometry():
     d = _load("mlp_geometry.csv")
     seeds = sorted(d["seed"].unique())
@@ -563,6 +591,7 @@ ALL = {
     "figB_fss": fig_fss,
     "figB_baselines": fig_baselines,
     "figB_lar": fig_lar,
+    "figB_lar_timing": fig_lar_timing,
     "figB_mlp_geometry": fig_mlp_geometry,
 }
 

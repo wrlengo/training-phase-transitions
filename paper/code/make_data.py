@@ -340,7 +340,26 @@ def build_mlp_geometry() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 10. Key numbers for inline text
+# 10. Early-warning timing and the matched single-rate comparison (appendix B.11, B.12)
+# ---------------------------------------------------------------------------
+def build_early_warning() -> None:
+    cols = [
+        "seed", "grokking_step", "fluctuation_onset_step", "onset_leads_by",
+        "variance_peak_step", "peak_lags_by", "peak_to_background",
+    ]
+    tt = _read("phase1_grokking_lar/lar_variance_timing.csv").loc[:, cols]
+    tt.to_csv(DATA / "lar_timing.csv", index=False)
+    tr = _read("phase1_grokking_lar/metrics.csv").loc[:, ["seed", "step", "test_acc", "lar"]]
+    tr.to_csv(DATA / "lar_trajectory.csv", index=False)
+
+
+def build_crossarch_singlelr() -> None:
+    c = _read("phase2b_mlp_grokking/cross_arch_comparison.csv")
+    c.to_csv(DATA / "crossarch_singlelr.csv", index=False)
+
+
+# ---------------------------------------------------------------------------
+# 11. Key numbers for inline text
 # ---------------------------------------------------------------------------
 def key_numbers(
     conv: pd.DataFrame,
@@ -458,6 +477,8 @@ def main() -> None:
     build_baselines()
     build_lar()
     build_mlp_geometry()
+    build_early_warning()
+    build_crossarch_singlelr()
 
     kn = key_numbers(conv, theory, attn, stop, modular, wd)
     (DATA / "key_numbers.json").write_text(json.dumps(kn, indent=2))

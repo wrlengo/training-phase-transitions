@@ -60,7 +60,7 @@ Our contributions are:
 5. An empirical assessment of entropy production as a stopping criterion: second best to validation early stopping, usable when no validation set exists.
 6. A reproducible pipeline: complete per-step metrics and configs, analysis and figure code, and a reproduction guide, intended as an experimental framework for follow-up work.
 
-The remainder of the paper follows the order of the evidence. Section @sec-framework defines the observables and the protocol. Section @sec-convnet presents the ConvNet instability, Section @sec-transformer and Section @sec-cross compare architectures, Section @sec-theory confronts the free-energy expansion with the measurements, and Section @sec-stopping evaluates the stopping rule. Section @sec-discussion collects limitations, and Section @sec-conclusion states the conclusions.
+The remainder of the paper follows the order of the evidence. @sec-framework defines the observables and the protocol. @sec-convnet presents the ConvNet instability, @sec-transformer and @sec-cross compare architectures, @sec-theory confronts the free-energy expansion with the measurements, and @sec-stopping evaluates the stopping rule. @sec-discussion collects limitations, and @sec-conclusion states the conclusions.
 
 # Experimental framework and reproducibility {#sec-framework}
 
@@ -74,7 +74,7 @@ We treat the weights as the system and the stream of mini-batches as the bath. T
 
 *Free energy* is $F = U - \eta S$. The learning rate $\eta$ multiplies the entropy and plays the role of a noise scale; we deliberately do not call it a temperature. The only quantity called temperature in this paper is $T_{\rm attn}$, the softmax temperature of the Transformer's attention, which is a model parameter and not a training hyperparameter. We keep $\eta_c$ for the transition point of the entropy order parameter and $\eta_c^{\star}$ for the value predicted by the free-energy expansion; the two are never used interchangeably.
 
-*Entropy production* $\sigma = \dot S + G - \eta Q$ is defined and used only in Section @sec-stopping, where $G = \lVert \nabla L \rVert^2$ and $Q$ is the curvature-weighted noise term introduced in Section @sec-theory.
+*Entropy production* $\sigma = \dot S + G - \eta Q$ is defined and used only in @sec-stopping, where $G = \lVert \nabla L \rVert^2$ and $Q$ is the curvature-weighted noise term introduced in @sec-theory.
 
 ## Order parameter
 
@@ -86,7 +86,7 @@ The histogram estimator has a known bias of order $(K_{\rm occ}-1)/(2N)$ [@panin
 
 ## Scanning protocol
 
-Table 1 gives the full protocol. The ConvNet grid has 13 rates, obtained by pooling a five-point scan used for the free-energy trajectories with an eight-point scan added around the suspected transition. The two modular architectures share one nine-point grid, one task, one split, one optimiser setting and one weight-decay value, so that the Transformer–MLP comparison varies the architecture and nothing else. The ConvNet differs from the modular pair in task and in weight decay; we return to that confound in Section @sec-cross.
+Table 1 gives the full protocol. The ConvNet grid has 13 rates, obtained by pooling a five-point scan used for the free-energy trajectories with an eight-point scan added around the suspected transition. The two modular architectures share one nine-point grid, one task, one split, one optimiser setting and one weight-decay value, so that the Transformer–MLP comparison varies the architecture and nothing else. The ConvNet differs from the modular pair in task and in weight decay; we return to that confound in @sec-cross.
 
 **Table 1.** Scanning protocol. Every run is identified by (architecture, $\eta$, seed); the same three seeds are used throughout.
 
@@ -103,27 +103,27 @@ t1 = pd.DataFrame(
 show_table(t1)
 ```
 
-All runs use AdamW [@loshchilov2019decoupled], the decoupled form of Adam [@kingma2015adam]: the ConvNet with the default moment settings, the two modular models with $\beta_1 = 0.9$ and $\beta_2 = 0.98$, following the grokking literature [@power2022grokking]. All runs use PyTorch [@paszke2019pytorch]. The data split seed is 42 everywhere. The ConvNet logs every 1000 steps, the modular models every 100; the finer interval is needed because their runs are shorter and because the entropy-production analysis in Section @sec-stopping requires a resolved derivative.
+All runs use AdamW [@loshchilov2019decoupled], the decoupled form of Adam [@kingma2015adam]: the ConvNet with the default moment settings, the two modular models with $\beta_1 = 0.9$ and $\beta_2 = 0.98$, following the grokking literature [@power2022grokking]. All runs use PyTorch [@paszke2019pytorch]. The data split seed is 42 everywhere. The ConvNet logs every 1000 steps, the modular models every 100; the finer interval is needed because their runs are shorter and because the entropy-production analysis in @sec-stopping requires a resolved derivative.
 
 Each run records its executed step budget in `config.json` (`total_steps_per_run_used`), and every number in this paper refers to that budget.
 
 ## Infrastructure
 
-Each run writes a `metrics_*.csv` with one row per logged step, a `config.json`, and a final checkpoint. The CSVs carry the observables ($U$, $S$, $F$), the behavioural metrics (train and test accuracy), and the auxiliary quantities used in Section @sec-theory ($G$, the gradient-covariance trace, the Hessian trace, and the two prediction columns). Every figure and table can therefore be rebuilt from archived files without retraining.
+Each run writes a `metrics_*.csv` with one row per logged step, a `config.json`, and a final checkpoint. The CSVs carry the observables ($U$, $S$, $F$), the behavioural metrics (train and test accuracy), and the auxiliary quantities used in @sec-theory ($G$, the gradient-covariance trace, the Hessian trace, and the two prediction columns). Every figure and table can therefore be rebuilt from archived files without retraining.
 
-Two design choices protect the analysis from post-hoc adjustment. First, the bin edges are frozen at the seed-0 initialisation before any run is inspected, and every run is binned with those edges. Second, the stopping rule of Section @sec-stopping is stated in two versions: the rule used for the reported numbers (a centred 21-epoch smoothing of $\dot S$ plus a five-epoch persistence criterion) and the naive single-crossing epoch, which is kept in its own column (`naive_signflip_epoch`). Reporting the naive version as well makes the smoothing visible and shows how much it mattered.
+Two design choices protect the analysis from post-hoc adjustment. First, the bin edges are frozen at the seed-0 initialisation before any run is inspected, and every run is binned with those edges. Second, the stopping rule of @sec-stopping is stated in two versions: the rule used for the reported numbers (a centred 21-epoch smoothing of $\dot S$ plus a five-epoch persistence criterion) and the naive single-crossing epoch, which is kept in its own column (`naive_signflip_epoch`). Reporting the naive version as well makes the smoothing visible and shows how much it mattered.
 
 The same scripts accept a demonstration configuration: three learning rates, one seed and 5,000 steps, which verifies that the workflow executes end to end in minutes. Every number here comes from the full configuration, and the executed step count in each `config.json` makes the distinction visible, so a reader who reruns the demo cannot mistake its output for a reproduction of the results.
 
 ## Neutral comparison
 
-Reproducibility has become a review criterion in its own right [@pineau2021improving], and Computo's review process runs the submitted workflow, so the infrastructure is part of the argument rather than an appendix to it. The neutral-comparison principle is enforced in four places: one observable definition, one scanning protocol, one fitting routine for the one-sided power-law fit of Section @sec-convnet together with one bootstrap, and one exclusion rule. A run is excluded if it did not reach its full step budget or if any $S$ was non-finite; no run was excluded on the basis of its accuracy. Because the exclusion rule is mechanical, it cannot be tuned to favour one architecture.
+Reproducibility has become a review criterion in its own right [@pineau2021improving], and Computo's review process runs the submitted workflow, so the infrastructure is part of the argument rather than an appendix to it. The neutral-comparison principle is enforced in four places: one observable definition, one scanning protocol, one fitting routine for the one-sided power-law fit of @sec-convnet together with one bootstrap, and one exclusion rule. A run is excluded if it did not reach its full step budget or if any $S$ was non-finite; no run was excluded on the basis of its accuracy. Because the exclusion rule is mechanical, it cannot be tuned to favour one architecture.
 
 # ConvNet: a sharp entropy instability {#sec-convnet}
 
 ## Collapse and decoupling from accuracy
 
-Figure @fig-convnet (a) shows $m(\eta)$ for the 13 ConvNet rates, with validation accuracy on the right axis. At the low end $m$ is indistinguishable from zero ($m = 0.0023$ at $\eta = 0.001$), and at the high end it saturates near $0.84$. The bulk of the collapse lies between $\eta = 0.02$ and $\eta = 0.06$: $m = 0.024$ at $0.02$, $0.108$ at $0.03$, $0.565$ at $0.05$, and $0.691$ at $0.06$. The collapse spans four grid points, so it is narrow but not instantaneous; its width is set by the grid spacing.
+@fig-convnet (a) shows $m(\eta)$ for the 13 ConvNet rates, with validation accuracy on the right axis. At the low end $m$ is indistinguishable from zero ($m = 0.0023$ at $\eta = 0.001$), and at the high end it saturates near $0.84$. The bulk of the collapse lies between $\eta = 0.02$ and $\eta = 0.06$: $m = 0.024$ at $0.02$, $0.108$ at $0.03$, $0.565$ at $0.05$, and $0.691$ at $0.06$. The collapse spans four grid points, so it is narrow but not instantaneous; its width is set by the grid spacing.
 
 The right axis of the same panel answers the obvious objection that $m$ is simply tracking training failure. It is not. The validation accuracy at $\eta = 0.001, 0.01, 0.02, 0.03$ and $0.05$ is $0.701$, $0.722$, $0.733$, $0.733$ and $0.720$: a band of $3.2$ percentage points whose maximum sits at $\eta = 0.035$. At $\eta = 0.05$, where the order parameter has already lost $56$ per cent of its range, accuracy is still $0.720$. Accuracy stays above $0.70$ up to $\eta = 0.06$, where $m$ has already reached $0.691$; by $\eta = 0.1$ it has fallen to $0.612$ while $m$ is $0.803$. The entropy transition therefore precedes, and is decoupled from, the accuracy collapse. The decoupling is the strongest single piece of evidence that $m$ is not a proxy for failure.
 
@@ -133,7 +133,7 @@ Validation accuracy is available at every rate: the five-point scan stored it pe
 
 ## Susceptibility
 
-Figure @fig-convnet (b) plots ${\rm Var}_{\rm seed}(S_{\rm final})$ against $\eta$. The variance rises from the numerical floor at low rates, peaks at $\eta = 0.035$ with a seed standard deviation of $0.189$, and falls again at high rates. The peak location is independent of the fit used in Section @sec-exponents and of the choice of order parameter: it is a property of the ensemble at fixed rate, not of the curve. The peak coincides with the fitted transition point $\eta_c = 0.035$ to within the grid spacing.
+@fig-convnet (b) plots ${\rm Var}_{\rm seed}(S_{\rm final})$ against $\eta$. The variance rises from the numerical floor at low rates, peaks at $\eta = 0.035$ with a seed standard deviation of $0.189$, and falls again at high rates. The peak location is independent of the fit used in @sec-exponents and of the choice of order parameter: it is a property of the ensemble at fixed rate, not of the curve. The peak coincides with the fitted transition point $\eta_c = 0.035$ to within the grid spacing.
 
 ## Coexistence of branches
 
@@ -141,17 +141,17 @@ The susceptibility peak has a simple origin. At $\eta = 0.03$ the three seeds en
 
 ## Critical exponents (exploratory) {#sec-exponents}
 
-A one-sided fit $m \propto (\eta - \eta_c)^{\beta}$ over the 13 rates, with 5,000 bootstrap resamples at the run level, gives $\eta_c = 0.035$ with a 95 per cent interval of $[0.029, 0.050]$, and $\beta = 0.358$ as the point estimate. The bootstrap distribution of $\beta$ is multi-modal and its median is $0.243$, with a 95 per cent interval of $[0.075, 0.394]$. Appendix B (Figure @fig-bootstrap) shows the two distributions.
+A one-sided fit $m \propto (\eta - \eta_c)^{\beta}$ over the 13 rates, with 5,000 bootstrap resamples at the run level, gives $\eta_c = 0.035$ with a 95 per cent interval of $[0.029, 0.050]$, and $\beta = 0.358$ as the point estimate. The bootstrap distribution of $\beta$ is multi-modal and its median is $0.243$, with a 95 per cent interval of $[0.075, 0.394]$. Appendix B (@fig-bootstrap) shows the two distributions.
 
 We report these as exploratory for a structural reason: only two grid points lie within the $\eta_c$ interval, so $\beta$ is determined by the spacing of the grid rather than by the data. We therefore do not use $\beta$ in any quantitative statement and do not quote it in the abstract or the conclusion.
 
 ## Weight decay
 
-Figure @fig-wd repeats the scan at three weight-decay values. Between the baseline $5\times10^{-4}$ and $10^{-2}$, a twentyfold change, the midpoint at which $m$ crosses $0.3$ moves from $0.040$ to $0.038$, a shift of a few per cent and far less than the width of the transition. The instability is therefore not a fine-tuning of the regularisation strength.
+@fig-wd repeats the scan at three weight-decay values. Between the baseline $5\times10^{-4}$ and $10^{-2}$, a twentyfold change, the midpoint at which $m$ crosses $0.3$ moves from $0.040$ to $0.038$, a shift of a few per cent and far less than the width of the transition. The instability is therefore not a fine-tuning of the regularisation strength.
 
-The third curve is a negative control and matters more than it may appear. At weight decay 1.0 the network never reaches a trainable phase: $m$ is already $0.195$ at the lowest rate, where accuracy is $0.585$, and at high rates accuracy is at chance ($0.10$) while $m$ is near its maximum. A high value of $m$ can therefore mean that the weights have been driven to zero, not that a spectral concentration has occurred. This is exactly why the three-signature rule of Section @sec-framework is necessary: $m$ alone cannot distinguish a transition from a dead network, and the susceptibility and the coexistence of branches are what separate the two.
+The third curve is a negative control and matters more than it may appear. At weight decay 1.0 the network never reaches a trainable phase: $m$ is already $0.195$ at the lowest rate, where accuracy is $0.585$, and at high rates accuracy is at chance ($0.10$) while $m$ is near its maximum. A high value of $m$ can therefore mean that the weights have been driven to zero, not that a spectral concentration has occurred. This is exactly why the three-signature rule of @sec-framework is necessary: $m$ alone cannot distinguish a transition from a dead network, and the susceptibility and the coexistence of branches are what separate the two.
 
-![Order parameter versus learning rate at three weight-decay settings. The baseline curve repeats the 13-rate scan of Figure @fig-convnet; the $10^{-2}$ curve uses a nine-rate grid; the weight-decay-1.0 curve is a negative control in which the trainable phase is destroyed.](figures/fig2_wd.pdf){#fig-wd width=70%}
+![Order parameter versus learning rate at three weight-decay settings. The baseline curve repeats the 13-rate scan of @fig-convnet; the $10^{-2}$ curve uses a nine-rate grid; the weight-decay-1.0 curve is a negative control in which the trainable phase is destroyed.](figures/fig2_wd.pdf){#fig-wd width=70%}
 
 # Transformer: attention temperature {#sec-transformer}
 
@@ -159,19 +159,19 @@ The Transformer carries one observable that the ConvNet does not: the softmax te
 
 ## Collapse of the learned temperature
 
-Figure @fig-attention (a) shows $T_{\rm attn}$ against step for three seeds. The temperature leaves its initial value within the first hundred steps and falls below $1.5$ by step 1600 in all three runs, ending at $0.939$. Generalisation arrives much later: the grokking step is $6800$, $8800$ and $9800$ for the three seeds, so the cooling leads the generalisation transition by $5200$, $7200$ and $8200$ steps. The lead is large compared with the width of either event, and it is consistent across seeds.
+@fig-attention (a) shows $T_{\rm attn}$ against step for three seeds. The temperature leaves its initial value within the first hundred steps and falls below $1.5$ by step 1600 in all three runs, ending at $0.939$. Generalisation arrives much later: the grokking step is $6800$, $8800$ and $9800$ for the three seeds, so the cooling leads the generalisation transition by $5200$, $7200$ and $8200$ steps. The lead is large compared with the width of either event, and it is consistent across seeds.
 
 ## Entropy-temperature sweep
 
-Figure @fig-attention (b) sweeps $T_{\rm attn}$ at inference and records the Shannon entropy of the attention distributions. The entropy falls from a high-temperature plateau to a low-temperature plateau through a sigmoid, and the half-rise rule gives $T_c = 2.711 \pm 0.476$ across seeds. The temperature the model actually learns is about a factor of $2.9$ below this crossover temperature, which places the trained model well inside the low-entropy regime rather than near the crossover.
+@fig-attention (b) sweeps $T_{\rm attn}$ at inference and records the Shannon entropy of the attention distributions. The entropy falls from a high-temperature plateau to a low-temperature plateau through a sigmoid, and the half-rise rule gives $T_c = 2.711 \pm 0.476$ across seeds. The temperature the model actually learns is about a factor of $2.9$ below this crossover temperature, which places the trained model well inside the low-entropy regime rather than near the crossover.
 
-This sweep concerns $T_{\rm attn}$ and $S_{\rm attn}$, not the learning rate and the weight entropy. The two statements are different: Section @sec-cross scans $\eta$ and measures the entropy of the weights, while this section holds the weights fixed and varies a model parameter. We keep them in separate sections because conflating them is the easiest way to misread the paper.
+This sweep concerns $T_{\rm attn}$ and $S_{\rm attn}$, not the learning rate and the weight entropy. The two statements are different: @sec-cross scans $\eta$ and measures the entropy of the weights, while this section holds the weights fixed and varies a model parameter. We keep them in separate sections because conflating them is the easiest way to misread the paper.
 
 ## Interpretation
 
 Cooling precedes generalisation in this architecture, on this task, with three seeds. That is a description, not a causal claim. The single architecture and the single task limit its scope. The observation is consistent with the mechanistic picture in which attention sharpens onto a small set of Fourier components before the readout learns to use them [@nanda2023progress], but consistency is not evidence for that mechanism.
 
-One further geometric diagnostic, the log-alignment ratio of the unembedding, tracks generalisation closely in this model. It is not a thermodynamic quantity and does not enter the free-energy analysis, so it is reported only in Appendix B (Figure @fig-lar).
+One further geometric diagnostic, the log-alignment ratio of the unembedding, tracks generalisation closely in this model. It is not a thermodynamic quantity and does not enter the free-energy analysis, so it is reported only in Appendix B (@fig-lar).
 
 ![Attention temperature. (a) Mean learned temperature $T_{\rm attn}$ during training for three seeds; dotted vertical lines mark the grokking step of each seed and the horizontal line is $T_{\rm attn}=1.5$. (b) Attention entropy against inference temperature, one curve per seed with the seed mean in black; the dashed line is the half-rise crossover temperature and the dotted line is the learned value.](figures/fig3_attention.pdf){#fig-attention width=100%}
 
@@ -179,7 +179,7 @@ One further geometric diagnostic, the log-alignment ratio of the unembedding, tr
 
 ## Transformer: an inverted order parameter
 
-Figure @fig-crossarch (a) places the three scans on one axis, and the Transformer curve does not resemble the ConvNet curve. Its order parameter is already $0.482$ at the lowest rate, rises to a peak of $0.537$ at $\eta = 10^{-3}$, and then falls to $0.352$ at $\eta = 0.1$, with a shallow secondary maximum near $10^{-2}$. There is no rate at which $m$ approaches zero, so there is no high-entropy phase to pass out of. Over the 27 runs the rank correlation between $m$ and $\log\eta$ is $-0.711$: the order parameter moves opposite to the learning rate. For the ConvNet the same statistic is $0.974$, so even the sign of the correlation is an architecture-dependent fact.
+@fig-crossarch (a) places the three scans on one axis, and the Transformer curve does not resemble the ConvNet curve. Its order parameter is already $0.482$ at the lowest rate, rises to a peak of $0.537$ at $\eta = 10^{-3}$, and then falls to $0.352$ at $\eta = 0.1$, with a shallow secondary maximum near $10^{-2}$. There is no rate at which $m$ approaches zero, so there is no high-entropy phase to pass out of. Over the 27 runs the rank correlation between $m$ and $\log\eta$ is $-0.711$: the order parameter moves opposite to the learning rate. For the ConvNet the same statistic is $0.974$, so even the sign of the correlation is an architecture-dependent fact.
 
 The peak at $\eta = 10^{-3}$ coincides with the rate at which the model groks in all three seeds (test accuracy $1.000$). At $\eta = 10^{-4}$ accuracy is $0.176$, at $3\times10^{-3}$ it is $0.988$, at $10^{-2}$ it is $0.841$, and at $0.1$ it is $0.141$. Behaviour therefore changes sharply across the grid while $m$ changes smoothly and in the wrong direction.
 
@@ -189,7 +189,7 @@ The MLP curve is flat. Across the whole nine-point grid $m$ stays between $0.001
 
 ## Behaviour versus entropy
 
-Figure @fig-crossarch (b) shows the behavioural phase diagram. The ConvNet loses accuracy above $\eta = 0.07$; the Transformer has a grokking window between $10^{-3}$ and $5\times10^{-3}$ where test accuracy is above 98 per cent, degrades at $10^{-2}$, and fails at both ends; the MLP succeeds from $10^{-3}$ to $0.1$. Behavioural transitions are present in all three architectures. The entropy order parameter responds to them in only one.
+@fig-crossarch (b) shows the behavioural phase diagram. The ConvNet loses accuracy above $\eta = 0.07$; the Transformer has a grokking window between $10^{-3}$ and $5\times10^{-3}$ where test accuracy is above 98 per cent, degrades at $10^{-2}$, and fails at both ends; the MLP succeeds from $10^{-3}$ to $0.1$. Behavioural transitions are present in all three architectures. The entropy order parameter responds to them in only one.
 
 The Transformer–MLP pair is the controlled comparison. It shares the task, the data split, the weight decay, the optimiser settings, the batch size, the seed set and the learning-rate grid; only the architecture differs. Under an identical protocol, $m$ peaks and declines in the Transformer and stays flat in the MLP. That contrast does not depend on any comparison with the ConvNet, and it is the observation that carries the architecture-dependence claim.
 
@@ -225,7 +225,7 @@ Three explanations are available, and this experiment cannot separate them.
 
 The first is geometric. Weight-histogram entropy is blind to the arrangement of the weights: two matrices with the same multiset of entries have the same $S$. Generalisation in attention models is associated with low-rank reorganisation of specific matrices [@nanda2023progress], which changes alignment and spectra without necessarily changing the marginal distribution of entries. A spectral observable would see this reorganisation; a histogram need not.
 
-The second is the optimiser. AdamW normalises each coordinate by a running second moment, so the effective metric differs between architectures with different gradient statistics. Under a metric $D$, the natural volume element changes by $\prod_i D_i^{-1/2}$, and a histogram of raw values does not account for it. Section @sec-theory uses this observation to propose a correction; it also means that the same $S$ may measure different things in different architectures.
+The second is the optimiser. AdamW normalises each coordinate by a running second moment, so the effective metric differs between architectures with different gradient statistics. Under a metric $D$, the natural volume element changes by $\prod_i D_i^{-1/2}$, and a histogram of raw values does not account for it. @sec-theory uses this observation to propose a correction; it also means that the same $S$ may measure different things in different architectures.
 
 The third is the confound between architecture and task. The ConvNet sees images, the modular models see a discrete algorithmic task; the ConvNet uses a small weight decay, the modular models use weight decay 1.0, which the ConvNet control shows is destructive. The ConvNet–modular comparison is therefore not controlled, and we do not base the architecture claim on it. The Transformer–MLP comparison is controlled, and it shows that the failure is not a property of the modular task alone.
 
@@ -254,13 +254,13 @@ where $H$ is the Hessian, $g$ the mean batch gradient, $\Sigma$ the batch-to-bat
 
 $$\dot F \approx -\eta G\left(1 - \frac{\eta}{\eta_c^{\star}}\right), \qquad \eta_c^{\star} = \frac{G}{Q}.$$
 
-This yields two predictions. **P1**: the free energy stops decreasing at $\eta_c^{\star}$, so the zero crossing of $\dot F/\eta$ against $\eta$ estimates the transition. **P2**: the same ratio $G/Q$, evaluated locally at each rate, should agree with the transition point measured by the order parameter. P1 uses only the drift; P2 uses only local quantities. Neither requires a fitted exponent, so neither is circular with respect to the analysis of Section @sec-convnet.
+This yields two predictions. **P1**: the free energy stops decreasing at $\eta_c^{\star}$, so the zero crossing of $\dot F/\eta$ against $\eta$ estimates the transition. **P2**: the same ratio $G/Q$, evaluated locally at each rate, should agree with the transition point measured by the order parameter. P1 uses only the drift; P2 uses only local quantities. Neither requires a fitted exponent, so neither is circular with respect to the analysis of @sec-convnet.
 
 ## Comparison with measurement
 
-Figure @fig-thermo shows the trajectories that the expansion is meant to describe, together with the energy-entropy plane for all rates. Figure @fig-theory (a) plots $\dot F/\eta$ in the steady window against $\eta$. The linear fit crosses zero at $\eta = 0.089$, compared with the measured $\eta_c = 0.035$: a factor of $2.6$. The theory places the transition at the right order of magnitude and on the right side of the measured value, and the fitted line changes sign in the same region as the measured points; individual rates, however, scatter around it by more than its distance to zero in the transition window.
+@fig-thermo shows the trajectories that the expansion is meant to describe, together with the energy-entropy plane for all rates. @fig-theory (a) plots $\dot F/\eta$ in the steady window against $\eta$. The linear fit crosses zero at $\eta = 0.089$, compared with the measured $\eta_c = 0.035$: a factor of $2.6$. The theory places the transition at the right order of magnitude and on the right side of the measured value, and the fitted line changes sign in the same region as the measured points; individual rates, however, scatter around it by more than its distance to zero in the transition window.
 
-Figure @fig-theory (b) gives P2, the locally evaluated $\eta_c^{\star} = G/Q$. The values are $2005$ on average, with a range of $826$ to $3195$. Against the measured $0.035$, the prediction is wrong by nearly five orders of magnitude. Equivalently, the $\eta^2 Q$ term is four orders of magnitude below the $\eta G$ term at the measured transition, so the expansion predicts that noise is negligible precisely where the measured entropy undergoes its transition.
+@fig-theory (b) gives P2, the locally evaluated $\eta_c^{\star} = G/Q$. The values are $2005$ on average, with a range of $826$ to $3195$. Against the measured $0.035$, the prediction is wrong by nearly five orders of magnitude. Equivalently, the $\eta^2 Q$ term is four orders of magnitude below the $\eta G$ term at the measured transition, so the expansion predicts that noise is negligible precisely where the measured entropy undergoes its transition.
 
 ## The isotropic approximation
 
@@ -284,7 +284,7 @@ We report this as a quantitative failure of the isotropic approximation, not as 
 
 ## Definition and noise sources
 
-With the weights as the system and the data stream as the bath, the entropy production is $\sigma = \dot S + G - \eta Q \geq 0$ [@seifert2012stochastic], and it vanishes only when the entropy change is balanced exactly by the drift and the noise. Three sources contribute to the measured $\dot S$: the histogram estimator, whose sampling error is of order $\sqrt{2}\,\mathrm{std}(S)$ per interval [@paninski2003estimation]; batch-to-batch diffusion, which scales with $\eta^2$; and critical fluctuations, which grow near the transition and are visible in the seed-to-seed variance of Section @sec-convnet.
+With the weights as the system and the data stream as the bath, the entropy production is $\sigma = \dot S + G - \eta Q \geq 0$ [@seifert2012stochastic], and it vanishes only when the entropy change is balanced exactly by the drift and the noise. Three sources contribute to the measured $\dot S$: the histogram estimator, whose sampling error is of order $\sqrt{2}\,\mathrm{std}(S)$ per interval [@paninski2003estimation]; batch-to-batch diffusion, which scales with $\eta^2$; and critical fluctuations, which grow near the transition and are visible in the seed-to-seed variance of @sec-convnet.
 
 The operational rule follows from the first source. A run is stopped when the smoothed $\dot S$ has been non-positive for five consecutive epochs after a warm-up of the first ten per cent of the budget; the smoothing is a centred 21-epoch window. The unsmoothed first crossing is retained in a separate column so that the effect of smoothing can be inspected.
 
@@ -326,11 +326,11 @@ The results reduce to five statements, each with an explicit strength. (i) The C
 
 The tempting summary is that the thermodynamic language fails. It does not fail; it is conditional. A weight-histogram entropy measures how spread out the marginal distribution of weights is, and whether that quantity has a sharp, rate-driven transition depends on how the architecture stores what it has learned. In the ConvNet the entropy collapse and the loss plateau are distinct events that can be separated cleanly. In the modular models the stored function is a discrete algorithm built from a few Fourier components [@nanda2023progress], and the marginal weight distribution does not reorganise in the same way.
 
-This is a hypothesis, and Section @sec-mechanisms lists the three mechanisms that could produce it. Only one of them — the geometric blindness of a histogram — is specific to the choice of observable; the other two are properties of the optimiser and of the task.
+This is a hypothesis, and @sec-mechanisms lists the three mechanisms that could produce it. Only one of them — the geometric blindness of a histogram — is specific to the choice of observable; the other two are properties of the optimiser and of the task.
 
 ## Methodological contribution
 
-The reusable part of this paper is the protocol, not the number. A comparison of observables is only interpretable when the observable definition, the scan, the fit, the bootstrap and the exclusion rule are fixed in advance and reported. Section @sec-protocol condenses this into six steps, and the archive contains the per-step records needed to reapply the same analysis to a new architecture without retraining the published models.
+The reusable part of this paper is the protocol, not the number. A comparison of observables is only interpretable when the observable definition, the scan, the fit, the bootstrap and the exclusion rule are fixed in advance and reported. @sec-protocol condenses this into six steps, and the archive contains the per-step records needed to reapply the same analysis to a new architecture without retraining the published models.
 
 ## Limitations
 
@@ -338,7 +338,7 @@ The protocols are not fully isomorphic. The ConvNet differs from the modular pai
 
 The exponent $\beta$ is not identified. The bootstrap is multi-modal and only two grid points fall inside the $\eta_c$ interval, so the value is reported as exploratory and used nowhere. The finite-size scaling analysis (Appendix B) is in the same position: three widths at three rates are too few to identify a collapse, and the best-fit parameters sit at the edge of the search grid.
 
-The temperature study covers one architecture and one task, with three seeds. The finite-resolution argument of Section @sec-stopping limits what can be said about $\dot S$ at a 1000-step interval. Finally, the ConvNet was executed for 200,000 steps; all statements refer to that budget.
+The temperature study covers one architecture and one task, with three seeds. The finite-resolution argument of @sec-stopping limits what can be said about $\dot S$ at a 1000-step interval. Finally, the ConvNet was executed for 200,000 steps; all statements refer to that budget.
 
 ## Candidate observables
 
@@ -381,7 +381,7 @@ The practical implication is narrow and specific. Before an observable is used a
 
 # Data and code availability {.unnumbered}
 
-All per-step and per-epoch metrics, the configuration files and the data behind every figure are in the public repository at `github.com/wrlengo/training-phase-transitions`, together with the 15 final checkpoints (9.6 MB). The repository carries a reproducible build: a GitHub Actions workflow renders the manuscript on every push, and the rendered paper is served at `wrlengo.github.io/training-phase-transitions`. Releases `v1.0.1`&ndash;`v1.0.3` are archived on Zenodo under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416), which resolves to the latest version. Text and figures are released under CC-BY 4.0 and code under the MIT licence.
+All per-step and per-epoch metrics, the configuration files and the data behind every figure are in the public repository at `github.com/wrlengo/training-phase-transitions`, together with the 15 final checkpoints (9.6 MB). The repository carries a reproducible build: a GitHub Actions workflow renders the manuscript on every push, and the rendered paper is served at `wrlengo.github.io/training-phase-transitions`. Releases `v1.0.1`&ndash;`v1.0.4` are archived on Zenodo under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416), which resolves to the latest version. Text and figures are released under CC-BY 4.0 and code under the MIT licence.
 
 # Funding and competing interests {.unnumbered}
 
@@ -456,23 +456,23 @@ show_table(tb2)
 
 ## B.4 Bootstrap distributions
 
-The bootstrap of Section @sec-exponents resamples runs within each rate, refits the one-sided power law, and retains 5,000 accepted fits. The $\eta_c$ distribution is unimodal; the $\beta$ distribution is not, which is the reason the exponent is reported as exploratory.
+The bootstrap of @sec-exponents resamples runs within each rate, refits the one-sided power law, and retains 5,000 accepted fits. The $\eta_c$ distribution is unimodal; the $\beta$ distribution is not, which is the reason the exponent is reported as exploratory.
 
 ![Bootstrap distributions of the transition point and the exponent, with 95 per cent intervals (dashed) and medians (dotted).](figures/figB_bootstrap.pdf){#fig-bootstrap width=100%}
 
 ## B.5 Stopping criterion
 
-Table 3 gives the per-seed numbers; Figure @fig-stopping shows them next to the validation optimum and the full budget. The naive crossing column is the unsmoothed first sign change and differs from the smoothed trigger by a few epochs in each seed, which is the intended disclosure of the smoothing.
+Table 3 gives the per-seed numbers; @fig-stopping shows them next to the validation optimum and the full budget. The naive crossing column is the unsmoothed first sign change and differs from the smoothed trigger by a few epochs in each seed, which is the intended disclosure of the smoothing.
 
 ## B.6 Baseline signals
 
-Five signals were timed against grokking on the Transformer: the log-alignment ratio, the spectral entropy of the unembedding, the gradient norm, the weight norm and the Hessian trace. Their onset times, in steps relative to the grokking step, are shown in Figure @fig-baselines. The gradient norm, weight norm and Hessian trace lead by $6133$ steps on average, the log-alignment ratio by $2567$ and the spectral entropy by $2533$. At a 1000-step horizon the correlations with the later accuracy change are highest for the log-alignment ratio ($0.686$ to $0.792$) and the spectral entropy ($0.712$ to $0.828$).
+Five signals were timed against grokking on the Transformer: the log-alignment ratio, the spectral entropy of the unembedding, the gradient norm, the weight norm and the Hessian trace. Their onset times, in steps relative to the grokking step, are shown in @fig-baselines. The gradient norm, weight norm and Hessian trace lead by $6133$ steps on average, the log-alignment ratio by $2567$ and the spectral entropy by $2533$. At a 1000-step horizon the correlations with the later accuracy change are highest for the log-alignment ratio ($0.686$ to $0.792$) and the spectral entropy ($0.712$ to $0.828$).
 
 ![Timing of five baseline signals relative to the grokking step, one point per seed with a horizontal bar at the mean. Negative values mean the signal moves before generalisation.](figures/figB_baselines.pdf){#fig-baselines width=70%}
 
 ## B.7 Finite-size scaling
 
-Three widths (4, 8 and 12 channels), three rates and three seeds give a best-fit collapse at $\eta_c = 0.016$, $1/\nu = 0.20$ and $\beta/\nu = 0.20$, with the parameters at the boundary of the search grid. Figure @fig-fss shows the raw curves. With three rates per width the collapse is weakly identified, and we report it as exploratory only; it is not used anywhere in the main text.
+Three widths (4, 8 and 12 channels), three rates and three seeds give a best-fit collapse at $\eta_c = 0.016$, $1/\nu = 0.20$ and $\beta/\nu = 0.20$, with the parameters at the boundary of the search grid. @fig-fss shows the raw curves. With three rates per width the collapse is weakly identified, and we report it as exploratory only; it is not used anywhere in the main text.
 
 ![Order parameter against learning rate for three network widths. The curves are raw means with seed standard deviations; no collapse has been applied.](figures/figB_fss.pdf){#fig-fss width=70%}
 
@@ -487,7 +487,7 @@ tb3.columns = ["eta", "G", "Q", "predicted eta_c*", "measured sd of dS", "estima
 show_table(tb3, ".5f")
 ```
 
-The ratio $Q/G$ is small at every rate, which is the same statement as P2 in Section @sec-theory: the curvature term is four orders of magnitude below the drift term. The measured scatter is below the estimator floor at all eight rates, so the physical residual is zero to within the estimator at seven of them.
+The ratio $Q/G$ is small at every rate, which is the same statement as P2 in @sec-theory: the curvature term is four orders of magnitude below the drift term. The measured scatter is below the estimator floor at all eight rates, so the physical residual is zero to within the estimator at seven of them.
 
 ## B.9 Log-alignment ratio
 
@@ -503,9 +503,62 @@ The flat histogram entropy of the MLP does not mean that nothing changes in this
 
 The geometric quantities move sharply at the start of training and then drift. At initialisation the participation ratio of the first layer is $110$ and its stable rank $38$; by step 500 the participation ratio has fallen to $67$ and the stable rank to $0.99$, while test accuracy is still zero. Over the plateau that precedes grokking (steps 10,000 to 50,000) the participation ratio averages $106$ and the stable rank $0.54$; at the end of the budget they are $111$ and $0.42$. The second layer behaves similarly: its participation ratio rises from $70$ to $77$ while its stable rank falls from $45$ to $0.10$. The per-input Jacobian stable rank falls from $82$ at initialisation to $0.027$ at step 500 and to $0.001$ at the end, and the normalised Jacobian spectral entropy stays between $0.77$ and $0.88$ throughout. The PCA-95 dimension of the hidden representation expands from $153$ to $194$, and the effective number of Fourier components falls from $260$ at initialisation to between $52$ and $68$ over the rest of the run.
 
-Grokking, defined as the first logged step with test accuracy above $0.9$, occurs at $54{,}000$, $58{,}000$ and $65{,}500$ steps for the three seeds. None of the geometric quantities has a feature there: the movement happens within the first 500 steps, before test accuracy leaves zero, and afterwards the drift is monotone and slow. In this architecture the behavioural transition is spectrally quiet, which is consistent with the flat order parameter of Section @sec-cross and separates the failure of the histogram from a failure of the measurement apparatus.
+Grokking, defined as the first logged step with test accuracy above $0.9$, occurs at $54{,}000$, $58{,}000$ and $65{,}500$ steps for the three seeds. None of the geometric quantities has a feature there: the movement happens within the first 500 steps, before test accuracy leaves zero, and afterwards the drift is monotone and slow. In this architecture the behavioural transition is spectrally quiet, which is consistent with the flat order parameter of @sec-cross and separates the failure of the histogram from a failure of the measurement apparatus.
 
 ![Geometric observables of the MLP at $\eta = 10^{-3}$, one line per seed. (a) Test accuracy; the dotted line marks the mean grokking step. (b) Participation ratio of the two weight matrices. (c) Stable rank of the first weight matrix and of the per-input Jacobian, on a logarithmic axis.](figures/figB_mlp_geometry.pdf){#fig-mlp-geometry width=100%}
+
+## B.11 Early-warning timing of the log-alignment ratio
+
+@sec-cross asked which observable moves before a transition, and Appendix B.6 timed five signals at a 1000-step horizon. Here we report the timing of the log-alignment ratio on its own protocol: modular addition at $\eta = 10^{-3}$ with a 30 per cent training split, three seeds, 25,000 steps and logging every 500 steps. Table B.4 gives the per-seed numbers and @fig-lar-timing shows the trajectories.
+
+**Table B.4.** Timing of the log-alignment ratio relative to the grokking step, one row per seed: the first sustained fluctuation and its lead, the rolling-variance peak and its lag, and the peak-to-background ratio of that variance.
+
+```{python}
+#| echo: false
+tb4 = pd.read_csv("data/lar_timing.csv")
+tb4.columns = ["seed", "grokking step", "fluctuation onset", "lead",
+               "variance peak", "lag", "peak / background"]
+for c in tb4.columns[:-1]:
+    tb4[c] = tb4[c].astype(int).astype(str)
+tb4[tb4.columns[-1]] = tb4[tb4.columns[-1]].map(lambda v: f"{v:.1f}")
+show_table(tb4)
+```
+
+The ratio rises from $0.47$&ndash;$0.50$ at initialisation to $0.68$&ndash;$0.71$ at the end of the budget. Its first sustained fluctuation precedes grokking by $900$ to $1300$ steps, and its rolling variance peaks $900$ to $1100$ steps after grokking, by a factor of $60$ to $145$ over the initial variance. In the second set of three runs at the same protocol (Appendix B.6) the lead is $1900$ to $3400$ steps, so the direction is reproducible while the magnitude is not.
+
+![Log-alignment ratio against step for the three seeds of the early-warning protocol. The open square marks the onset of sustained fluctuation and the filled circle the grokking step.](figures/figB_lar_timing.pdf){#fig-lar-timing width=60%}
+
+Two readings follow. The ratio moves before accuracy does, and its variability is largest around the transition, which is the same qualitative pattern that the entropy shows in the ConvNet (@sec-convnet). It carries no thermodynamic interpretation, however: the ratio is a geometric quantity measured on the unembedding and the activations, and it is not an order parameter in the sense of @sec-framework. We report it because it makes the architecture dependence concrete: a signal can lead a behavioural transition on the Transformer without being the order parameter that fails on it.
+
+## B.12 The two modular architectures at a matched single rate
+
+Table B.5 collects the runs at $\eta = 10^{-3}$ that underlie the left-hand panel of @fig-crossarch, three seeds per architecture. The Transformer groks at $5700$&ndash;$7400$ steps, the MLP at $32{,}600$&ndash;$37{,}200$. The log-alignment ratio rises in both, by $0.12$&ndash;$0.19$, and the effective number of Fourier components falls: from $129$&ndash;$170$ to $17$&ndash;$22$ in the Transformer and from $252$&ndash;$275$ to $68$ in the MLP. The geometric summaries diverge, however. The PCA-95 dimension of the hidden representation contracts in the Transformer ($52$&ndash;$54$ to $15$&ndash;$20$) and expands in the MLP ($150$&ndash;$154$ to $193$&ndash;$196$), the same asymmetry that Appendix B.10 reports for the MLP alone.
+
+**Table B.5.** Matched single-rate comparison of the two modular architectures at $\eta = 10^{-3}$: grokking step, final accuracy, log-alignment ratio, effective number of Fourier components and PCA-95 dimension, one row per seed.
+
+```{python}
+#| echo: false
+tb5 = pd.read_csv("data/crossarch_singlelr.csv")
+tb5 = tb5.rename(columns={
+    "architecture": "arch", "grokking_step": "grokking step",
+    "final_test_acc": "final acc", "LAR_initial": "LAR init",
+    "LAR_at_grokking": "LAR at grokking", "LAR_final": "LAR final",
+    "k_eff_initial": "k_eff init", "k_eff_final": "k_eff final",
+    "pca95_initial": "PCA-95 init", "pca95_final": "PCA-95 final",
+})
+tb5 = tb5.loc[:, ["arch", "seed", "grokking step", "final acc", "LAR init",
+                  "LAR at grokking", "LAR final", "k_eff init", "k_eff final",
+                  "PCA-95 init", "PCA-95 final"]]
+for c in ["seed", "grokking step", "PCA-95 init", "PCA-95 final"]:
+    tb5[c] = tb5[c].astype(int).astype(str)
+for c in ["final acc", "LAR init", "LAR at grokking", "LAR final"]:
+    tb5[c] = tb5[c].map(lambda v: f"{v:.3f}")
+for c in ["k_eff init", "k_eff final"]:
+    tb5[c] = tb5[c].map(lambda v: f"{v:.1f}")
+show_table(tb5)
+```
+
+Read together with @sec-cross, the table separates two questions that are easy to conflate. Behavioural transitions are present in both architectures and start at very different times, which is a property of the task and the optimiser. The histogram order parameter is flat in one of them and inverted in the other, which is a property of the observable. The geometric quantities move in both, in opposite directions, and none of them peaks at the grokking step.
 
 # Appendix C: Reproduction guide {#sec-appC .unnumbered}
 
@@ -529,4 +582,4 @@ The manuscript uses the Computo Quarto extension, which is vendored in `paper/_e
 quarto add computorg/computo-quarto-extension
 ```
 
-Text and figures are released under CC-BY 4.0 and code under the MIT licence. The data and code archive is in the public repository `github.com/wrlengo/training-phase-transitions`, tagged `v1.0.3`, and archived under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416).
+Text and figures are released under CC-BY 4.0 and code under the MIT licence. The data and code archive is in the public repository `github.com/wrlengo/training-phase-transitions`, tagged `v1.0.4`, and archived under the concept DOI [10.5281/zenodo.23957416](https://doi.org/10.5281/zenodo.23957416).
