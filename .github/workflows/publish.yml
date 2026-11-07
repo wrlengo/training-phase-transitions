@@ -36,9 +36,9 @@ jobs:
         run: |
           tlmgr update --self
           tlmgr install libertinus libertinus-fonts libertine \
-                        fontspec unicode-math lmodern \
+                        fontspec unicode-math \
                         orcidlink lineno draftwatermark adjustbox \
-                        pgf xcolor tabularx \
+                        pgf xcolor \
                         booktabs caption csquotes biblatex biber
 
       - name: Render manuscript (HTML)
