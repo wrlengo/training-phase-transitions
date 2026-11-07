@@ -35,10 +35,10 @@ jobs:
       - name: Install LaTeX packages needed by the template
         run: |
           tlmgr update --self
-          tlmgr install libertinus libertinus-fonts libertine libertine-fonts \
+          tlmgr install libertinus libertinus-fonts libertine \
                         fontspec unicode-math lmodern \
                         orcidlink lineno draftwatermark adjustbox \
-                        pgf xcolor tabularx amsmath \
+                        pgf xcolor tabularx \
                         booktabs caption csquotes biblatex biber
 
       - name: Render manuscript (HTML)
